@@ -1,0 +1,4 @@
+#!/bin/sh
+cd `dirname $0`
+../src/fttr_50g_10g_gpon -n .:../src $*
+# for shared lib, use: opp_run -l ../src/fttr_50g_10g_gpon -n .:../src $*
