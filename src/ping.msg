@@ -16,4 +16,5 @@
 message ping
 {
     int ONU_id;
+    int SFU_id;
 }

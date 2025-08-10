@@ -23,11 +23,17 @@ class ethPacket;
  * packet ethPacket extends cPacket
  * {
  *     simtime_t GenerationTime;
+ *     simtime_t WapArrivalTime;
+ *     simtime_t WapDepartureTime;
+ *     simtime_t SfuArrivalTime;
+ *     simtime_t SfuDepartureTime;
  *     simtime_t OnuArrivalTime;
  *     simtime_t OnuDepartureTime;
  *     simtime_t OltArrivalTime;
  * 
  *     int OnuId;							// intended receipient ONU
+ *     int SfuId;
+ *     int MfuId;
  *     int TContId;						// T-CONT type
  *     int FragmentCount = 0;				// id of fragmented packet
  * }
@@ -37,10 +43,16 @@ class ethPacket : public ::omnetpp::cPacket
 {
   protected:
     omnetpp::simtime_t GenerationTime = SIMTIME_ZERO;
+    omnetpp::simtime_t WapArrivalTime = SIMTIME_ZERO;
+    omnetpp::simtime_t WapDepartureTime = SIMTIME_ZERO;
+    omnetpp::simtime_t SfuArrivalTime = SIMTIME_ZERO;
+    omnetpp::simtime_t SfuDepartureTime = SIMTIME_ZERO;
     omnetpp::simtime_t OnuArrivalTime = SIMTIME_ZERO;
     omnetpp::simtime_t OnuDepartureTime = SIMTIME_ZERO;
     omnetpp::simtime_t OltArrivalTime = SIMTIME_ZERO;
     int OnuId = 0;
+    int SfuId = 0;
+    int MfuId = 0;
     int TContId = 0;
     int FragmentCount = 0;
 
@@ -62,6 +74,18 @@ class ethPacket : public ::omnetpp::cPacket
     virtual omnetpp::simtime_t getGenerationTime() const;
     virtual void setGenerationTime(omnetpp::simtime_t GenerationTime);
 
+    virtual omnetpp::simtime_t getWapArrivalTime() const;
+    virtual void setWapArrivalTime(omnetpp::simtime_t WapArrivalTime);
+
+    virtual omnetpp::simtime_t getWapDepartureTime() const;
+    virtual void setWapDepartureTime(omnetpp::simtime_t WapDepartureTime);
+
+    virtual omnetpp::simtime_t getSfuArrivalTime() const;
+    virtual void setSfuArrivalTime(omnetpp::simtime_t SfuArrivalTime);
+
+    virtual omnetpp::simtime_t getSfuDepartureTime() const;
+    virtual void setSfuDepartureTime(omnetpp::simtime_t SfuDepartureTime);
+
     virtual omnetpp::simtime_t getOnuArrivalTime() const;
     virtual void setOnuArrivalTime(omnetpp::simtime_t OnuArrivalTime);
 
@@ -73,6 +97,12 @@ class ethPacket : public ::omnetpp::cPacket
 
     virtual int getOnuId() const;
     virtual void setOnuId(int OnuId);
+
+    virtual int getSfuId() const;
+    virtual void setSfuId(int SfuId);
+
+    virtual int getMfuId() const;
+    virtual void setMfuId(int MfuId);
 
     virtual int getTContId() const;
     virtual void setTContId(int TContId);

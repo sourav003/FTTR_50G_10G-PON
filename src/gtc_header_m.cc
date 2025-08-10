@@ -170,6 +170,13 @@ gtc_header::~gtc_header()
     delete [] this->Onu_grant_TC2;
     delete [] this->Onu_start_time_TC3;
     delete [] this->Onu_grant_TC3;
+    delete [] this->Mfu_sfu_rtt;
+    delete [] this->Sfu_start_time_TC1;
+    delete [] this->Sfu_grant_TC1;
+    delete [] this->Sfu_start_time_TC2;
+    delete [] this->Sfu_grant_TC2;
+    delete [] this->Sfu_start_time_TC3;
+    delete [] this->Sfu_grant_TC3;
 }
 
 gtc_header& gtc_header::operator=(const gtc_header& other)
@@ -226,7 +233,51 @@ void gtc_header::copy(const gtc_header& other)
     for (size_t i = 0; i < Onu_grant_TC3_arraysize; i++) {
         this->Onu_grant_TC3[i] = other.Onu_grant_TC3[i];
     }
+    delete [] this->Mfu_sfu_rtt;
+    this->Mfu_sfu_rtt = (other.Mfu_sfu_rtt_arraysize==0) ? nullptr : new double[other.Mfu_sfu_rtt_arraysize];
+    Mfu_sfu_rtt_arraysize = other.Mfu_sfu_rtt_arraysize;
+    for (size_t i = 0; i < Mfu_sfu_rtt_arraysize; i++) {
+        this->Mfu_sfu_rtt[i] = other.Mfu_sfu_rtt[i];
+    }
+    delete [] this->Sfu_start_time_TC1;
+    this->Sfu_start_time_TC1 = (other.Sfu_start_time_TC1_arraysize==0) ? nullptr : new double[other.Sfu_start_time_TC1_arraysize];
+    Sfu_start_time_TC1_arraysize = other.Sfu_start_time_TC1_arraysize;
+    for (size_t i = 0; i < Sfu_start_time_TC1_arraysize; i++) {
+        this->Sfu_start_time_TC1[i] = other.Sfu_start_time_TC1[i];
+    }
+    delete [] this->Sfu_grant_TC1;
+    this->Sfu_grant_TC1 = (other.Sfu_grant_TC1_arraysize==0) ? nullptr : new double[other.Sfu_grant_TC1_arraysize];
+    Sfu_grant_TC1_arraysize = other.Sfu_grant_TC1_arraysize;
+    for (size_t i = 0; i < Sfu_grant_TC1_arraysize; i++) {
+        this->Sfu_grant_TC1[i] = other.Sfu_grant_TC1[i];
+    }
+    delete [] this->Sfu_start_time_TC2;
+    this->Sfu_start_time_TC2 = (other.Sfu_start_time_TC2_arraysize==0) ? nullptr : new double[other.Sfu_start_time_TC2_arraysize];
+    Sfu_start_time_TC2_arraysize = other.Sfu_start_time_TC2_arraysize;
+    for (size_t i = 0; i < Sfu_start_time_TC2_arraysize; i++) {
+        this->Sfu_start_time_TC2[i] = other.Sfu_start_time_TC2[i];
+    }
+    delete [] this->Sfu_grant_TC2;
+    this->Sfu_grant_TC2 = (other.Sfu_grant_TC2_arraysize==0) ? nullptr : new double[other.Sfu_grant_TC2_arraysize];
+    Sfu_grant_TC2_arraysize = other.Sfu_grant_TC2_arraysize;
+    for (size_t i = 0; i < Sfu_grant_TC2_arraysize; i++) {
+        this->Sfu_grant_TC2[i] = other.Sfu_grant_TC2[i];
+    }
+    delete [] this->Sfu_start_time_TC3;
+    this->Sfu_start_time_TC3 = (other.Sfu_start_time_TC3_arraysize==0) ? nullptr : new double[other.Sfu_start_time_TC3_arraysize];
+    Sfu_start_time_TC3_arraysize = other.Sfu_start_time_TC3_arraysize;
+    for (size_t i = 0; i < Sfu_start_time_TC3_arraysize; i++) {
+        this->Sfu_start_time_TC3[i] = other.Sfu_start_time_TC3[i];
+    }
+    delete [] this->Sfu_grant_TC3;
+    this->Sfu_grant_TC3 = (other.Sfu_grant_TC3_arraysize==0) ? nullptr : new double[other.Sfu_grant_TC3_arraysize];
+    Sfu_grant_TC3_arraysize = other.Sfu_grant_TC3_arraysize;
+    for (size_t i = 0; i < Sfu_grant_TC3_arraysize; i++) {
+        this->Sfu_grant_TC3[i] = other.Sfu_grant_TC3[i];
+    }
     this->OnuID = other.OnuID;
+    this->SfuID = other.SfuID;
+    this->MfuID = other.MfuID;
     this->BufferOccupancyTC1 = other.BufferOccupancyTC1;
     this->BufferOccupancyTC2 = other.BufferOccupancyTC2;
     this->BufferOccupancyTC3 = other.BufferOccupancyTC3;
@@ -252,7 +303,23 @@ void gtc_header::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimArrayPacking(b,this->Onu_start_time_TC3,Onu_start_time_TC3_arraysize);
     b->pack(Onu_grant_TC3_arraysize);
     doParsimArrayPacking(b,this->Onu_grant_TC3,Onu_grant_TC3_arraysize);
+    b->pack(Mfu_sfu_rtt_arraysize);
+    doParsimArrayPacking(b,this->Mfu_sfu_rtt,Mfu_sfu_rtt_arraysize);
+    b->pack(Sfu_start_time_TC1_arraysize);
+    doParsimArrayPacking(b,this->Sfu_start_time_TC1,Sfu_start_time_TC1_arraysize);
+    b->pack(Sfu_grant_TC1_arraysize);
+    doParsimArrayPacking(b,this->Sfu_grant_TC1,Sfu_grant_TC1_arraysize);
+    b->pack(Sfu_start_time_TC2_arraysize);
+    doParsimArrayPacking(b,this->Sfu_start_time_TC2,Sfu_start_time_TC2_arraysize);
+    b->pack(Sfu_grant_TC2_arraysize);
+    doParsimArrayPacking(b,this->Sfu_grant_TC2,Sfu_grant_TC2_arraysize);
+    b->pack(Sfu_start_time_TC3_arraysize);
+    doParsimArrayPacking(b,this->Sfu_start_time_TC3,Sfu_start_time_TC3_arraysize);
+    b->pack(Sfu_grant_TC3_arraysize);
+    doParsimArrayPacking(b,this->Sfu_grant_TC3,Sfu_grant_TC3_arraysize);
     doParsimPacking(b,this->OnuID);
+    doParsimPacking(b,this->SfuID);
+    doParsimPacking(b,this->MfuID);
     doParsimPacking(b,this->BufferOccupancyTC1);
     doParsimPacking(b,this->BufferOccupancyTC2);
     doParsimPacking(b,this->BufferOccupancyTC3);
@@ -320,7 +387,65 @@ void gtc_header::parsimUnpack(omnetpp::cCommBuffer *b)
         this->Onu_grant_TC3 = new double[Onu_grant_TC3_arraysize];
         doParsimArrayUnpacking(b,this->Onu_grant_TC3,Onu_grant_TC3_arraysize);
     }
+    delete [] this->Mfu_sfu_rtt;
+    b->unpack(Mfu_sfu_rtt_arraysize);
+    if (Mfu_sfu_rtt_arraysize == 0) {
+        this->Mfu_sfu_rtt = nullptr;
+    } else {
+        this->Mfu_sfu_rtt = new double[Mfu_sfu_rtt_arraysize];
+        doParsimArrayUnpacking(b,this->Mfu_sfu_rtt,Mfu_sfu_rtt_arraysize);
+    }
+    delete [] this->Sfu_start_time_TC1;
+    b->unpack(Sfu_start_time_TC1_arraysize);
+    if (Sfu_start_time_TC1_arraysize == 0) {
+        this->Sfu_start_time_TC1 = nullptr;
+    } else {
+        this->Sfu_start_time_TC1 = new double[Sfu_start_time_TC1_arraysize];
+        doParsimArrayUnpacking(b,this->Sfu_start_time_TC1,Sfu_start_time_TC1_arraysize);
+    }
+    delete [] this->Sfu_grant_TC1;
+    b->unpack(Sfu_grant_TC1_arraysize);
+    if (Sfu_grant_TC1_arraysize == 0) {
+        this->Sfu_grant_TC1 = nullptr;
+    } else {
+        this->Sfu_grant_TC1 = new double[Sfu_grant_TC1_arraysize];
+        doParsimArrayUnpacking(b,this->Sfu_grant_TC1,Sfu_grant_TC1_arraysize);
+    }
+    delete [] this->Sfu_start_time_TC2;
+    b->unpack(Sfu_start_time_TC2_arraysize);
+    if (Sfu_start_time_TC2_arraysize == 0) {
+        this->Sfu_start_time_TC2 = nullptr;
+    } else {
+        this->Sfu_start_time_TC2 = new double[Sfu_start_time_TC2_arraysize];
+        doParsimArrayUnpacking(b,this->Sfu_start_time_TC2,Sfu_start_time_TC2_arraysize);
+    }
+    delete [] this->Sfu_grant_TC2;
+    b->unpack(Sfu_grant_TC2_arraysize);
+    if (Sfu_grant_TC2_arraysize == 0) {
+        this->Sfu_grant_TC2 = nullptr;
+    } else {
+        this->Sfu_grant_TC2 = new double[Sfu_grant_TC2_arraysize];
+        doParsimArrayUnpacking(b,this->Sfu_grant_TC2,Sfu_grant_TC2_arraysize);
+    }
+    delete [] this->Sfu_start_time_TC3;
+    b->unpack(Sfu_start_time_TC3_arraysize);
+    if (Sfu_start_time_TC3_arraysize == 0) {
+        this->Sfu_start_time_TC3 = nullptr;
+    } else {
+        this->Sfu_start_time_TC3 = new double[Sfu_start_time_TC3_arraysize];
+        doParsimArrayUnpacking(b,this->Sfu_start_time_TC3,Sfu_start_time_TC3_arraysize);
+    }
+    delete [] this->Sfu_grant_TC3;
+    b->unpack(Sfu_grant_TC3_arraysize);
+    if (Sfu_grant_TC3_arraysize == 0) {
+        this->Sfu_grant_TC3 = nullptr;
+    } else {
+        this->Sfu_grant_TC3 = new double[Sfu_grant_TC3_arraysize];
+        doParsimArrayUnpacking(b,this->Sfu_grant_TC3,Sfu_grant_TC3_arraysize);
+    }
     doParsimUnpacking(b,this->OnuID);
+    doParsimUnpacking(b,this->SfuID);
+    doParsimUnpacking(b,this->MfuID);
     doParsimUnpacking(b,this->BufferOccupancyTC1);
     doParsimUnpacking(b,this->BufferOccupancyTC2);
     doParsimUnpacking(b,this->BufferOccupancyTC3);
@@ -809,6 +934,468 @@ void gtc_header::eraseOnu_grant_TC3(size_t k)
     Onu_grant_TC3_arraysize = newSize;
 }
 
+size_t gtc_header::getMfu_sfu_rttArraySize() const
+{
+    return Mfu_sfu_rtt_arraysize;
+}
+
+double gtc_header::getMfu_sfu_rtt(size_t k) const
+{
+    if (k >= Mfu_sfu_rtt_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Mfu_sfu_rtt_arraysize, (unsigned long)k);
+    return this->Mfu_sfu_rtt[k];
+}
+
+void gtc_header::setMfu_sfu_rttArraySize(size_t newSize)
+{
+    double *Mfu_sfu_rtt2 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Mfu_sfu_rtt_arraysize < newSize ? Mfu_sfu_rtt_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Mfu_sfu_rtt2[i] = this->Mfu_sfu_rtt[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Mfu_sfu_rtt2[i] = 0;
+    delete [] this->Mfu_sfu_rtt;
+    this->Mfu_sfu_rtt = Mfu_sfu_rtt2;
+    Mfu_sfu_rtt_arraysize = newSize;
+}
+
+void gtc_header::setMfu_sfu_rtt(size_t k, double Mfu_sfu_rtt)
+{
+    if (k >= Mfu_sfu_rtt_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Mfu_sfu_rtt_arraysize, (unsigned long)k);
+    this->Mfu_sfu_rtt[k] = Mfu_sfu_rtt;
+}
+
+void gtc_header::insertMfu_sfu_rtt(size_t k, double Mfu_sfu_rtt)
+{
+    if (k > Mfu_sfu_rtt_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Mfu_sfu_rtt_arraysize, (unsigned long)k);
+    size_t newSize = Mfu_sfu_rtt_arraysize + 1;
+    double *Mfu_sfu_rtt2 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Mfu_sfu_rtt2[i] = this->Mfu_sfu_rtt[i];
+    Mfu_sfu_rtt2[k] = Mfu_sfu_rtt;
+    for (i = k + 1; i < newSize; i++)
+        Mfu_sfu_rtt2[i] = this->Mfu_sfu_rtt[i-1];
+    delete [] this->Mfu_sfu_rtt;
+    this->Mfu_sfu_rtt = Mfu_sfu_rtt2;
+    Mfu_sfu_rtt_arraysize = newSize;
+}
+
+void gtc_header::appendMfu_sfu_rtt(double Mfu_sfu_rtt)
+{
+    insertMfu_sfu_rtt(Mfu_sfu_rtt_arraysize, Mfu_sfu_rtt);
+}
+
+void gtc_header::eraseMfu_sfu_rtt(size_t k)
+{
+    if (k >= Mfu_sfu_rtt_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Mfu_sfu_rtt_arraysize, (unsigned long)k);
+    size_t newSize = Mfu_sfu_rtt_arraysize - 1;
+    double *Mfu_sfu_rtt2 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Mfu_sfu_rtt2[i] = this->Mfu_sfu_rtt[i];
+    for (i = k; i < newSize; i++)
+        Mfu_sfu_rtt2[i] = this->Mfu_sfu_rtt[i+1];
+    delete [] this->Mfu_sfu_rtt;
+    this->Mfu_sfu_rtt = Mfu_sfu_rtt2;
+    Mfu_sfu_rtt_arraysize = newSize;
+}
+
+size_t gtc_header::getSfu_start_time_TC1ArraySize() const
+{
+    return Sfu_start_time_TC1_arraysize;
+}
+
+double gtc_header::getSfu_start_time_TC1(size_t k) const
+{
+    if (k >= Sfu_start_time_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC1_arraysize, (unsigned long)k);
+    return this->Sfu_start_time_TC1[k];
+}
+
+void gtc_header::setSfu_start_time_TC1ArraySize(size_t newSize)
+{
+    double *Sfu_start_time_TC12 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Sfu_start_time_TC1_arraysize < newSize ? Sfu_start_time_TC1_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Sfu_start_time_TC12[i] = this->Sfu_start_time_TC1[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Sfu_start_time_TC12[i] = 0;
+    delete [] this->Sfu_start_time_TC1;
+    this->Sfu_start_time_TC1 = Sfu_start_time_TC12;
+    Sfu_start_time_TC1_arraysize = newSize;
+}
+
+void gtc_header::setSfu_start_time_TC1(size_t k, double Sfu_start_time_TC1)
+{
+    if (k >= Sfu_start_time_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC1_arraysize, (unsigned long)k);
+    this->Sfu_start_time_TC1[k] = Sfu_start_time_TC1;
+}
+
+void gtc_header::insertSfu_start_time_TC1(size_t k, double Sfu_start_time_TC1)
+{
+    if (k > Sfu_start_time_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC1_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_start_time_TC1_arraysize + 1;
+    double *Sfu_start_time_TC12 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_start_time_TC12[i] = this->Sfu_start_time_TC1[i];
+    Sfu_start_time_TC12[k] = Sfu_start_time_TC1;
+    for (i = k + 1; i < newSize; i++)
+        Sfu_start_time_TC12[i] = this->Sfu_start_time_TC1[i-1];
+    delete [] this->Sfu_start_time_TC1;
+    this->Sfu_start_time_TC1 = Sfu_start_time_TC12;
+    Sfu_start_time_TC1_arraysize = newSize;
+}
+
+void gtc_header::appendSfu_start_time_TC1(double Sfu_start_time_TC1)
+{
+    insertSfu_start_time_TC1(Sfu_start_time_TC1_arraysize, Sfu_start_time_TC1);
+}
+
+void gtc_header::eraseSfu_start_time_TC1(size_t k)
+{
+    if (k >= Sfu_start_time_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC1_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_start_time_TC1_arraysize - 1;
+    double *Sfu_start_time_TC12 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_start_time_TC12[i] = this->Sfu_start_time_TC1[i];
+    for (i = k; i < newSize; i++)
+        Sfu_start_time_TC12[i] = this->Sfu_start_time_TC1[i+1];
+    delete [] this->Sfu_start_time_TC1;
+    this->Sfu_start_time_TC1 = Sfu_start_time_TC12;
+    Sfu_start_time_TC1_arraysize = newSize;
+}
+
+size_t gtc_header::getSfu_grant_TC1ArraySize() const
+{
+    return Sfu_grant_TC1_arraysize;
+}
+
+double gtc_header::getSfu_grant_TC1(size_t k) const
+{
+    if (k >= Sfu_grant_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC1_arraysize, (unsigned long)k);
+    return this->Sfu_grant_TC1[k];
+}
+
+void gtc_header::setSfu_grant_TC1ArraySize(size_t newSize)
+{
+    double *Sfu_grant_TC12 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Sfu_grant_TC1_arraysize < newSize ? Sfu_grant_TC1_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Sfu_grant_TC12[i] = this->Sfu_grant_TC1[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Sfu_grant_TC12[i] = 0;
+    delete [] this->Sfu_grant_TC1;
+    this->Sfu_grant_TC1 = Sfu_grant_TC12;
+    Sfu_grant_TC1_arraysize = newSize;
+}
+
+void gtc_header::setSfu_grant_TC1(size_t k, double Sfu_grant_TC1)
+{
+    if (k >= Sfu_grant_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC1_arraysize, (unsigned long)k);
+    this->Sfu_grant_TC1[k] = Sfu_grant_TC1;
+}
+
+void gtc_header::insertSfu_grant_TC1(size_t k, double Sfu_grant_TC1)
+{
+    if (k > Sfu_grant_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC1_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_grant_TC1_arraysize + 1;
+    double *Sfu_grant_TC12 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_grant_TC12[i] = this->Sfu_grant_TC1[i];
+    Sfu_grant_TC12[k] = Sfu_grant_TC1;
+    for (i = k + 1; i < newSize; i++)
+        Sfu_grant_TC12[i] = this->Sfu_grant_TC1[i-1];
+    delete [] this->Sfu_grant_TC1;
+    this->Sfu_grant_TC1 = Sfu_grant_TC12;
+    Sfu_grant_TC1_arraysize = newSize;
+}
+
+void gtc_header::appendSfu_grant_TC1(double Sfu_grant_TC1)
+{
+    insertSfu_grant_TC1(Sfu_grant_TC1_arraysize, Sfu_grant_TC1);
+}
+
+void gtc_header::eraseSfu_grant_TC1(size_t k)
+{
+    if (k >= Sfu_grant_TC1_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC1_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_grant_TC1_arraysize - 1;
+    double *Sfu_grant_TC12 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_grant_TC12[i] = this->Sfu_grant_TC1[i];
+    for (i = k; i < newSize; i++)
+        Sfu_grant_TC12[i] = this->Sfu_grant_TC1[i+1];
+    delete [] this->Sfu_grant_TC1;
+    this->Sfu_grant_TC1 = Sfu_grant_TC12;
+    Sfu_grant_TC1_arraysize = newSize;
+}
+
+size_t gtc_header::getSfu_start_time_TC2ArraySize() const
+{
+    return Sfu_start_time_TC2_arraysize;
+}
+
+double gtc_header::getSfu_start_time_TC2(size_t k) const
+{
+    if (k >= Sfu_start_time_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC2_arraysize, (unsigned long)k);
+    return this->Sfu_start_time_TC2[k];
+}
+
+void gtc_header::setSfu_start_time_TC2ArraySize(size_t newSize)
+{
+    double *Sfu_start_time_TC22 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Sfu_start_time_TC2_arraysize < newSize ? Sfu_start_time_TC2_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Sfu_start_time_TC22[i] = this->Sfu_start_time_TC2[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Sfu_start_time_TC22[i] = 0;
+    delete [] this->Sfu_start_time_TC2;
+    this->Sfu_start_time_TC2 = Sfu_start_time_TC22;
+    Sfu_start_time_TC2_arraysize = newSize;
+}
+
+void gtc_header::setSfu_start_time_TC2(size_t k, double Sfu_start_time_TC2)
+{
+    if (k >= Sfu_start_time_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC2_arraysize, (unsigned long)k);
+    this->Sfu_start_time_TC2[k] = Sfu_start_time_TC2;
+}
+
+void gtc_header::insertSfu_start_time_TC2(size_t k, double Sfu_start_time_TC2)
+{
+    if (k > Sfu_start_time_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC2_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_start_time_TC2_arraysize + 1;
+    double *Sfu_start_time_TC22 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_start_time_TC22[i] = this->Sfu_start_time_TC2[i];
+    Sfu_start_time_TC22[k] = Sfu_start_time_TC2;
+    for (i = k + 1; i < newSize; i++)
+        Sfu_start_time_TC22[i] = this->Sfu_start_time_TC2[i-1];
+    delete [] this->Sfu_start_time_TC2;
+    this->Sfu_start_time_TC2 = Sfu_start_time_TC22;
+    Sfu_start_time_TC2_arraysize = newSize;
+}
+
+void gtc_header::appendSfu_start_time_TC2(double Sfu_start_time_TC2)
+{
+    insertSfu_start_time_TC2(Sfu_start_time_TC2_arraysize, Sfu_start_time_TC2);
+}
+
+void gtc_header::eraseSfu_start_time_TC2(size_t k)
+{
+    if (k >= Sfu_start_time_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC2_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_start_time_TC2_arraysize - 1;
+    double *Sfu_start_time_TC22 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_start_time_TC22[i] = this->Sfu_start_time_TC2[i];
+    for (i = k; i < newSize; i++)
+        Sfu_start_time_TC22[i] = this->Sfu_start_time_TC2[i+1];
+    delete [] this->Sfu_start_time_TC2;
+    this->Sfu_start_time_TC2 = Sfu_start_time_TC22;
+    Sfu_start_time_TC2_arraysize = newSize;
+}
+
+size_t gtc_header::getSfu_grant_TC2ArraySize() const
+{
+    return Sfu_grant_TC2_arraysize;
+}
+
+double gtc_header::getSfu_grant_TC2(size_t k) const
+{
+    if (k >= Sfu_grant_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC2_arraysize, (unsigned long)k);
+    return this->Sfu_grant_TC2[k];
+}
+
+void gtc_header::setSfu_grant_TC2ArraySize(size_t newSize)
+{
+    double *Sfu_grant_TC22 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Sfu_grant_TC2_arraysize < newSize ? Sfu_grant_TC2_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Sfu_grant_TC22[i] = this->Sfu_grant_TC2[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Sfu_grant_TC22[i] = 0;
+    delete [] this->Sfu_grant_TC2;
+    this->Sfu_grant_TC2 = Sfu_grant_TC22;
+    Sfu_grant_TC2_arraysize = newSize;
+}
+
+void gtc_header::setSfu_grant_TC2(size_t k, double Sfu_grant_TC2)
+{
+    if (k >= Sfu_grant_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC2_arraysize, (unsigned long)k);
+    this->Sfu_grant_TC2[k] = Sfu_grant_TC2;
+}
+
+void gtc_header::insertSfu_grant_TC2(size_t k, double Sfu_grant_TC2)
+{
+    if (k > Sfu_grant_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC2_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_grant_TC2_arraysize + 1;
+    double *Sfu_grant_TC22 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_grant_TC22[i] = this->Sfu_grant_TC2[i];
+    Sfu_grant_TC22[k] = Sfu_grant_TC2;
+    for (i = k + 1; i < newSize; i++)
+        Sfu_grant_TC22[i] = this->Sfu_grant_TC2[i-1];
+    delete [] this->Sfu_grant_TC2;
+    this->Sfu_grant_TC2 = Sfu_grant_TC22;
+    Sfu_grant_TC2_arraysize = newSize;
+}
+
+void gtc_header::appendSfu_grant_TC2(double Sfu_grant_TC2)
+{
+    insertSfu_grant_TC2(Sfu_grant_TC2_arraysize, Sfu_grant_TC2);
+}
+
+void gtc_header::eraseSfu_grant_TC2(size_t k)
+{
+    if (k >= Sfu_grant_TC2_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC2_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_grant_TC2_arraysize - 1;
+    double *Sfu_grant_TC22 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_grant_TC22[i] = this->Sfu_grant_TC2[i];
+    for (i = k; i < newSize; i++)
+        Sfu_grant_TC22[i] = this->Sfu_grant_TC2[i+1];
+    delete [] this->Sfu_grant_TC2;
+    this->Sfu_grant_TC2 = Sfu_grant_TC22;
+    Sfu_grant_TC2_arraysize = newSize;
+}
+
+size_t gtc_header::getSfu_start_time_TC3ArraySize() const
+{
+    return Sfu_start_time_TC3_arraysize;
+}
+
+double gtc_header::getSfu_start_time_TC3(size_t k) const
+{
+    if (k >= Sfu_start_time_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC3_arraysize, (unsigned long)k);
+    return this->Sfu_start_time_TC3[k];
+}
+
+void gtc_header::setSfu_start_time_TC3ArraySize(size_t newSize)
+{
+    double *Sfu_start_time_TC32 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Sfu_start_time_TC3_arraysize < newSize ? Sfu_start_time_TC3_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Sfu_start_time_TC32[i] = this->Sfu_start_time_TC3[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Sfu_start_time_TC32[i] = 0;
+    delete [] this->Sfu_start_time_TC3;
+    this->Sfu_start_time_TC3 = Sfu_start_time_TC32;
+    Sfu_start_time_TC3_arraysize = newSize;
+}
+
+void gtc_header::setSfu_start_time_TC3(size_t k, double Sfu_start_time_TC3)
+{
+    if (k >= Sfu_start_time_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC3_arraysize, (unsigned long)k);
+    this->Sfu_start_time_TC3[k] = Sfu_start_time_TC3;
+}
+
+void gtc_header::insertSfu_start_time_TC3(size_t k, double Sfu_start_time_TC3)
+{
+    if (k > Sfu_start_time_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC3_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_start_time_TC3_arraysize + 1;
+    double *Sfu_start_time_TC32 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_start_time_TC32[i] = this->Sfu_start_time_TC3[i];
+    Sfu_start_time_TC32[k] = Sfu_start_time_TC3;
+    for (i = k + 1; i < newSize; i++)
+        Sfu_start_time_TC32[i] = this->Sfu_start_time_TC3[i-1];
+    delete [] this->Sfu_start_time_TC3;
+    this->Sfu_start_time_TC3 = Sfu_start_time_TC32;
+    Sfu_start_time_TC3_arraysize = newSize;
+}
+
+void gtc_header::appendSfu_start_time_TC3(double Sfu_start_time_TC3)
+{
+    insertSfu_start_time_TC3(Sfu_start_time_TC3_arraysize, Sfu_start_time_TC3);
+}
+
+void gtc_header::eraseSfu_start_time_TC3(size_t k)
+{
+    if (k >= Sfu_start_time_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_start_time_TC3_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_start_time_TC3_arraysize - 1;
+    double *Sfu_start_time_TC32 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_start_time_TC32[i] = this->Sfu_start_time_TC3[i];
+    for (i = k; i < newSize; i++)
+        Sfu_start_time_TC32[i] = this->Sfu_start_time_TC3[i+1];
+    delete [] this->Sfu_start_time_TC3;
+    this->Sfu_start_time_TC3 = Sfu_start_time_TC32;
+    Sfu_start_time_TC3_arraysize = newSize;
+}
+
+size_t gtc_header::getSfu_grant_TC3ArraySize() const
+{
+    return Sfu_grant_TC3_arraysize;
+}
+
+double gtc_header::getSfu_grant_TC3(size_t k) const
+{
+    if (k >= Sfu_grant_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC3_arraysize, (unsigned long)k);
+    return this->Sfu_grant_TC3[k];
+}
+
+void gtc_header::setSfu_grant_TC3ArraySize(size_t newSize)
+{
+    double *Sfu_grant_TC32 = (newSize==0) ? nullptr : new double[newSize];
+    size_t minSize = Sfu_grant_TC3_arraysize < newSize ? Sfu_grant_TC3_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        Sfu_grant_TC32[i] = this->Sfu_grant_TC3[i];
+    for (size_t i = minSize; i < newSize; i++)
+        Sfu_grant_TC32[i] = 0;
+    delete [] this->Sfu_grant_TC3;
+    this->Sfu_grant_TC3 = Sfu_grant_TC32;
+    Sfu_grant_TC3_arraysize = newSize;
+}
+
+void gtc_header::setSfu_grant_TC3(size_t k, double Sfu_grant_TC3)
+{
+    if (k >= Sfu_grant_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC3_arraysize, (unsigned long)k);
+    this->Sfu_grant_TC3[k] = Sfu_grant_TC3;
+}
+
+void gtc_header::insertSfu_grant_TC3(size_t k, double Sfu_grant_TC3)
+{
+    if (k > Sfu_grant_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC3_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_grant_TC3_arraysize + 1;
+    double *Sfu_grant_TC32 = new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_grant_TC32[i] = this->Sfu_grant_TC3[i];
+    Sfu_grant_TC32[k] = Sfu_grant_TC3;
+    for (i = k + 1; i < newSize; i++)
+        Sfu_grant_TC32[i] = this->Sfu_grant_TC3[i-1];
+    delete [] this->Sfu_grant_TC3;
+    this->Sfu_grant_TC3 = Sfu_grant_TC32;
+    Sfu_grant_TC3_arraysize = newSize;
+}
+
+void gtc_header::appendSfu_grant_TC3(double Sfu_grant_TC3)
+{
+    insertSfu_grant_TC3(Sfu_grant_TC3_arraysize, Sfu_grant_TC3);
+}
+
+void gtc_header::eraseSfu_grant_TC3(size_t k)
+{
+    if (k >= Sfu_grant_TC3_arraysize) throw omnetpp::cRuntimeError("Array of size %lu indexed by %lu", (unsigned long)Sfu_grant_TC3_arraysize, (unsigned long)k);
+    size_t newSize = Sfu_grant_TC3_arraysize - 1;
+    double *Sfu_grant_TC32 = (newSize == 0) ? nullptr : new double[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        Sfu_grant_TC32[i] = this->Sfu_grant_TC3[i];
+    for (i = k; i < newSize; i++)
+        Sfu_grant_TC32[i] = this->Sfu_grant_TC3[i+1];
+    delete [] this->Sfu_grant_TC3;
+    this->Sfu_grant_TC3 = Sfu_grant_TC32;
+    Sfu_grant_TC3_arraysize = newSize;
+}
+
 int gtc_header::getOnuID() const
 {
     return this->OnuID;
@@ -817,6 +1404,26 @@ int gtc_header::getOnuID() const
 void gtc_header::setOnuID(int OnuID)
 {
     this->OnuID = OnuID;
+}
+
+int gtc_header::getSfuID() const
+{
+    return this->SfuID;
+}
+
+void gtc_header::setSfuID(int SfuID)
+{
+    this->SfuID = SfuID;
+}
+
+int gtc_header::getMfuID() const
+{
+    return this->MfuID;
+}
+
+void gtc_header::setMfuID(int MfuID)
+{
+    this->MfuID = MfuID;
 }
 
 double gtc_header::getBufferOccupancyTC1() const
@@ -873,7 +1480,16 @@ class gtc_headerDescriptor : public omnetpp::cClassDescriptor
         FIELD_Onu_grant_TC2,
         FIELD_Onu_start_time_TC3,
         FIELD_Onu_grant_TC3,
+        FIELD_Mfu_sfu_rtt,
+        FIELD_Sfu_start_time_TC1,
+        FIELD_Sfu_grant_TC1,
+        FIELD_Sfu_start_time_TC2,
+        FIELD_Sfu_grant_TC2,
+        FIELD_Sfu_start_time_TC3,
+        FIELD_Sfu_grant_TC3,
         FIELD_OnuID,
+        FIELD_SfuID,
+        FIELD_MfuID,
         FIELD_BufferOccupancyTC1,
         FIELD_BufferOccupancyTC2,
         FIELD_BufferOccupancyTC3,
@@ -944,7 +1560,7 @@ const char *gtc_headerDescriptor::getProperty(const char *propertyName) const
 int gtc_headerDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 14+base->getFieldCount() : 14;
+    return base ? 23+base->getFieldCount() : 23;
 }
 
 unsigned int gtc_headerDescriptor::getFieldTypeFlags(int field) const
@@ -965,13 +1581,22 @@ unsigned int gtc_headerDescriptor::getFieldTypeFlags(int field) const
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Onu_grant_TC2
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Onu_start_time_TC3
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Onu_grant_TC3
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Mfu_sfu_rtt
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Sfu_start_time_TC1
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Sfu_grant_TC1
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Sfu_start_time_TC2
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Sfu_grant_TC2
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Sfu_start_time_TC3
+        FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Sfu_grant_TC3
         FD_ISEDITABLE,    // FIELD_OnuID
+        FD_ISEDITABLE,    // FIELD_SfuID
+        FD_ISEDITABLE,    // FIELD_MfuID
         FD_ISEDITABLE,    // FIELD_BufferOccupancyTC1
         FD_ISEDITABLE,    // FIELD_BufferOccupancyTC2
         FD_ISEDITABLE,    // FIELD_BufferOccupancyTC3
         FD_ISEDITABLE,    // FIELD_SeqID
     };
-    return (field >= 0 && field < 14) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 23) ? fieldTypeFlags[field] : 0;
 }
 
 const char *gtc_headerDescriptor::getFieldName(int field) const
@@ -992,13 +1617,22 @@ const char *gtc_headerDescriptor::getFieldName(int field) const
         "Onu_grant_TC2",
         "Onu_start_time_TC3",
         "Onu_grant_TC3",
+        "Mfu_sfu_rtt",
+        "Sfu_start_time_TC1",
+        "Sfu_grant_TC1",
+        "Sfu_start_time_TC2",
+        "Sfu_grant_TC2",
+        "Sfu_start_time_TC3",
+        "Sfu_grant_TC3",
         "OnuID",
+        "SfuID",
+        "MfuID",
         "BufferOccupancyTC1",
         "BufferOccupancyTC2",
         "BufferOccupancyTC3",
         "SeqID",
     };
-    return (field >= 0 && field < 14) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 23) ? fieldNames[field] : nullptr;
 }
 
 int gtc_headerDescriptor::findField(const char *fieldName) const
@@ -1014,11 +1648,20 @@ int gtc_headerDescriptor::findField(const char *fieldName) const
     if (strcmp(fieldName, "Onu_grant_TC2") == 0) return baseIndex + 6;
     if (strcmp(fieldName, "Onu_start_time_TC3") == 0) return baseIndex + 7;
     if (strcmp(fieldName, "Onu_grant_TC3") == 0) return baseIndex + 8;
-    if (strcmp(fieldName, "OnuID") == 0) return baseIndex + 9;
-    if (strcmp(fieldName, "BufferOccupancyTC1") == 0) return baseIndex + 10;
-    if (strcmp(fieldName, "BufferOccupancyTC2") == 0) return baseIndex + 11;
-    if (strcmp(fieldName, "BufferOccupancyTC3") == 0) return baseIndex + 12;
-    if (strcmp(fieldName, "SeqID") == 0) return baseIndex + 13;
+    if (strcmp(fieldName, "Mfu_sfu_rtt") == 0) return baseIndex + 9;
+    if (strcmp(fieldName, "Sfu_start_time_TC1") == 0) return baseIndex + 10;
+    if (strcmp(fieldName, "Sfu_grant_TC1") == 0) return baseIndex + 11;
+    if (strcmp(fieldName, "Sfu_start_time_TC2") == 0) return baseIndex + 12;
+    if (strcmp(fieldName, "Sfu_grant_TC2") == 0) return baseIndex + 13;
+    if (strcmp(fieldName, "Sfu_start_time_TC3") == 0) return baseIndex + 14;
+    if (strcmp(fieldName, "Sfu_grant_TC3") == 0) return baseIndex + 15;
+    if (strcmp(fieldName, "OnuID") == 0) return baseIndex + 16;
+    if (strcmp(fieldName, "SfuID") == 0) return baseIndex + 17;
+    if (strcmp(fieldName, "MfuID") == 0) return baseIndex + 18;
+    if (strcmp(fieldName, "BufferOccupancyTC1") == 0) return baseIndex + 19;
+    if (strcmp(fieldName, "BufferOccupancyTC2") == 0) return baseIndex + 20;
+    if (strcmp(fieldName, "BufferOccupancyTC3") == 0) return baseIndex + 21;
+    if (strcmp(fieldName, "SeqID") == 0) return baseIndex + 22;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -1040,13 +1683,22 @@ const char *gtc_headerDescriptor::getFieldTypeString(int field) const
         "double",    // FIELD_Onu_grant_TC2
         "double",    // FIELD_Onu_start_time_TC3
         "double",    // FIELD_Onu_grant_TC3
+        "double",    // FIELD_Mfu_sfu_rtt
+        "double",    // FIELD_Sfu_start_time_TC1
+        "double",    // FIELD_Sfu_grant_TC1
+        "double",    // FIELD_Sfu_start_time_TC2
+        "double",    // FIELD_Sfu_grant_TC2
+        "double",    // FIELD_Sfu_start_time_TC3
+        "double",    // FIELD_Sfu_grant_TC3
         "int",    // FIELD_OnuID
+        "int",    // FIELD_SfuID
+        "int",    // FIELD_MfuID
         "double",    // FIELD_BufferOccupancyTC1
         "double",    // FIELD_BufferOccupancyTC2
         "double",    // FIELD_BufferOccupancyTC3
         "long",    // FIELD_SeqID
     };
-    return (field >= 0 && field < 14) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 23) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **gtc_headerDescriptor::getFieldPropertyNames(int field) const
@@ -1092,6 +1744,13 @@ int gtc_headerDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) 
         case FIELD_Onu_grant_TC2: return pp->getOnu_grant_TC2ArraySize();
         case FIELD_Onu_start_time_TC3: return pp->getOnu_start_time_TC3ArraySize();
         case FIELD_Onu_grant_TC3: return pp->getOnu_grant_TC3ArraySize();
+        case FIELD_Mfu_sfu_rtt: return pp->getMfu_sfu_rttArraySize();
+        case FIELD_Sfu_start_time_TC1: return pp->getSfu_start_time_TC1ArraySize();
+        case FIELD_Sfu_grant_TC1: return pp->getSfu_grant_TC1ArraySize();
+        case FIELD_Sfu_start_time_TC2: return pp->getSfu_start_time_TC2ArraySize();
+        case FIELD_Sfu_grant_TC2: return pp->getSfu_grant_TC2ArraySize();
+        case FIELD_Sfu_start_time_TC3: return pp->getSfu_start_time_TC3ArraySize();
+        case FIELD_Sfu_grant_TC3: return pp->getSfu_grant_TC3ArraySize();
         default: return 0;
     }
 }
@@ -1115,6 +1774,13 @@ void gtc_headerDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field,
         case FIELD_Onu_grant_TC2: pp->setOnu_grant_TC2ArraySize(size); break;
         case FIELD_Onu_start_time_TC3: pp->setOnu_start_time_TC3ArraySize(size); break;
         case FIELD_Onu_grant_TC3: pp->setOnu_grant_TC3ArraySize(size); break;
+        case FIELD_Mfu_sfu_rtt: pp->setMfu_sfu_rttArraySize(size); break;
+        case FIELD_Sfu_start_time_TC1: pp->setSfu_start_time_TC1ArraySize(size); break;
+        case FIELD_Sfu_grant_TC1: pp->setSfu_grant_TC1ArraySize(size); break;
+        case FIELD_Sfu_start_time_TC2: pp->setSfu_start_time_TC2ArraySize(size); break;
+        case FIELD_Sfu_grant_TC2: pp->setSfu_grant_TC2ArraySize(size); break;
+        case FIELD_Sfu_start_time_TC3: pp->setSfu_start_time_TC3ArraySize(size); break;
+        case FIELD_Sfu_grant_TC3: pp->setSfu_grant_TC3ArraySize(size); break;
         default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'gtc_header'", field);
     }
 }
@@ -1152,7 +1818,16 @@ std::string gtc_headerDescriptor::getFieldValueAsString(omnetpp::any_ptr object,
         case FIELD_Onu_grant_TC2: return double2string(pp->getOnu_grant_TC2(i));
         case FIELD_Onu_start_time_TC3: return double2string(pp->getOnu_start_time_TC3(i));
         case FIELD_Onu_grant_TC3: return double2string(pp->getOnu_grant_TC3(i));
+        case FIELD_Mfu_sfu_rtt: return double2string(pp->getMfu_sfu_rtt(i));
+        case FIELD_Sfu_start_time_TC1: return double2string(pp->getSfu_start_time_TC1(i));
+        case FIELD_Sfu_grant_TC1: return double2string(pp->getSfu_grant_TC1(i));
+        case FIELD_Sfu_start_time_TC2: return double2string(pp->getSfu_start_time_TC2(i));
+        case FIELD_Sfu_grant_TC2: return double2string(pp->getSfu_grant_TC2(i));
+        case FIELD_Sfu_start_time_TC3: return double2string(pp->getSfu_start_time_TC3(i));
+        case FIELD_Sfu_grant_TC3: return double2string(pp->getSfu_grant_TC3(i));
         case FIELD_OnuID: return long2string(pp->getOnuID());
+        case FIELD_SfuID: return long2string(pp->getSfuID());
+        case FIELD_MfuID: return long2string(pp->getMfuID());
         case FIELD_BufferOccupancyTC1: return double2string(pp->getBufferOccupancyTC1());
         case FIELD_BufferOccupancyTC2: return double2string(pp->getBufferOccupancyTC2());
         case FIELD_BufferOccupancyTC3: return double2string(pp->getBufferOccupancyTC3());
@@ -1182,7 +1857,16 @@ void gtc_headerDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fi
         case FIELD_Onu_grant_TC2: pp->setOnu_grant_TC2(i,string2double(value)); break;
         case FIELD_Onu_start_time_TC3: pp->setOnu_start_time_TC3(i,string2double(value)); break;
         case FIELD_Onu_grant_TC3: pp->setOnu_grant_TC3(i,string2double(value)); break;
+        case FIELD_Mfu_sfu_rtt: pp->setMfu_sfu_rtt(i,string2double(value)); break;
+        case FIELD_Sfu_start_time_TC1: pp->setSfu_start_time_TC1(i,string2double(value)); break;
+        case FIELD_Sfu_grant_TC1: pp->setSfu_grant_TC1(i,string2double(value)); break;
+        case FIELD_Sfu_start_time_TC2: pp->setSfu_start_time_TC2(i,string2double(value)); break;
+        case FIELD_Sfu_grant_TC2: pp->setSfu_grant_TC2(i,string2double(value)); break;
+        case FIELD_Sfu_start_time_TC3: pp->setSfu_start_time_TC3(i,string2double(value)); break;
+        case FIELD_Sfu_grant_TC3: pp->setSfu_grant_TC3(i,string2double(value)); break;
         case FIELD_OnuID: pp->setOnuID(string2long(value)); break;
+        case FIELD_SfuID: pp->setSfuID(string2long(value)); break;
+        case FIELD_MfuID: pp->setMfuID(string2long(value)); break;
         case FIELD_BufferOccupancyTC1: pp->setBufferOccupancyTC1(string2double(value)); break;
         case FIELD_BufferOccupancyTC2: pp->setBufferOccupancyTC2(string2double(value)); break;
         case FIELD_BufferOccupancyTC3: pp->setBufferOccupancyTC3(string2double(value)); break;
@@ -1210,7 +1894,16 @@ omnetpp::cValue gtc_headerDescriptor::getFieldValue(omnetpp::any_ptr object, int
         case FIELD_Onu_grant_TC2: return pp->getOnu_grant_TC2(i);
         case FIELD_Onu_start_time_TC3: return pp->getOnu_start_time_TC3(i);
         case FIELD_Onu_grant_TC3: return pp->getOnu_grant_TC3(i);
+        case FIELD_Mfu_sfu_rtt: return pp->getMfu_sfu_rtt(i);
+        case FIELD_Sfu_start_time_TC1: return pp->getSfu_start_time_TC1(i);
+        case FIELD_Sfu_grant_TC1: return pp->getSfu_grant_TC1(i);
+        case FIELD_Sfu_start_time_TC2: return pp->getSfu_start_time_TC2(i);
+        case FIELD_Sfu_grant_TC2: return pp->getSfu_grant_TC2(i);
+        case FIELD_Sfu_start_time_TC3: return pp->getSfu_start_time_TC3(i);
+        case FIELD_Sfu_grant_TC3: return pp->getSfu_grant_TC3(i);
         case FIELD_OnuID: return pp->getOnuID();
+        case FIELD_SfuID: return pp->getSfuID();
+        case FIELD_MfuID: return pp->getMfuID();
         case FIELD_BufferOccupancyTC1: return pp->getBufferOccupancyTC1();
         case FIELD_BufferOccupancyTC2: return pp->getBufferOccupancyTC2();
         case FIELD_BufferOccupancyTC3: return pp->getBufferOccupancyTC3();
@@ -1240,7 +1933,16 @@ void gtc_headerDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int
         case FIELD_Onu_grant_TC2: pp->setOnu_grant_TC2(i,value.doubleValue()); break;
         case FIELD_Onu_start_time_TC3: pp->setOnu_start_time_TC3(i,value.doubleValue()); break;
         case FIELD_Onu_grant_TC3: pp->setOnu_grant_TC3(i,value.doubleValue()); break;
+        case FIELD_Mfu_sfu_rtt: pp->setMfu_sfu_rtt(i,value.doubleValue()); break;
+        case FIELD_Sfu_start_time_TC1: pp->setSfu_start_time_TC1(i,value.doubleValue()); break;
+        case FIELD_Sfu_grant_TC1: pp->setSfu_grant_TC1(i,value.doubleValue()); break;
+        case FIELD_Sfu_start_time_TC2: pp->setSfu_start_time_TC2(i,value.doubleValue()); break;
+        case FIELD_Sfu_grant_TC2: pp->setSfu_grant_TC2(i,value.doubleValue()); break;
+        case FIELD_Sfu_start_time_TC3: pp->setSfu_start_time_TC3(i,value.doubleValue()); break;
+        case FIELD_Sfu_grant_TC3: pp->setSfu_grant_TC3(i,value.doubleValue()); break;
         case FIELD_OnuID: pp->setOnuID(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_SfuID: pp->setSfuID(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_MfuID: pp->setMfuID(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_BufferOccupancyTC1: pp->setBufferOccupancyTC1(value.doubleValue()); break;
         case FIELD_BufferOccupancyTC2: pp->setBufferOccupancyTC2(value.doubleValue()); break;
         case FIELD_BufferOccupancyTC3: pp->setBufferOccupancyTC3(value.doubleValue()); break;

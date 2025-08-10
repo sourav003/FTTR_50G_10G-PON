@@ -1,3 +1,3 @@
-package fttr_5g_1g_gpon;
+package fttr_50g_10g_gpon;
 
 @license(LGPL);

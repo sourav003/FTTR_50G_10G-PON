@@ -16,11 +16,17 @@
 packet ethPacket extends cPacket
 {
     simtime_t GenerationTime;
+    simtime_t WapArrivalTime;
+    simtime_t WapDepartureTime;
+    simtime_t SfuArrivalTime;
+    simtime_t SfuDepartureTime;    
     simtime_t OnuArrivalTime;
     simtime_t OnuDepartureTime;
     simtime_t OltArrivalTime;
     
     int OnuId;							// intended receipient ONU
+    int SfuId;
+    int MfuId;
     int TContId;						// T-CONT type
     int FragmentCount = 0;				// id of fragmented packet
 }

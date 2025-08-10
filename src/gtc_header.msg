@@ -33,6 +33,14 @@ packet gtc_header extends cPacket
     double Onu_start_time_TC3[];
     double Onu_grant_TC3[];
     
+    double Mfu_sfu_rtt[];
+    double Sfu_start_time_TC1[];
+    double Sfu_grant_TC1[];
+    double Sfu_start_time_TC2[];
+    double Sfu_grant_TC2[];
+    double Sfu_start_time_TC3[];
+    double Sfu_grant_TC3[];
+    
     //uint8_t AllocID;					// 14 bits
     //uint8_t Flags;					// 2 bits
     //uint8_t StartTime;				// 16 bits
@@ -42,6 +50,8 @@ packet gtc_header extends cPacket
     //uint8_t HEC;						// 13 bits
     
     int OnuID;
+    int SfuID;
+    int MfuID;
     double BufferOccupancyTC1 = 0;				// 24 bits
     double BufferOccupancyTC2 = 0;				// 24 bits
     double BufferOccupancyTC3 = 0;				// 24 bits

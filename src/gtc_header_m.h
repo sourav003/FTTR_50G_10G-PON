@@ -40,6 +40,14 @@ class gtc_header;
  *     double Onu_start_time_TC3[];
  *     double Onu_grant_TC3[];
  * 
+ *     double Mfu_sfu_rtt[];
+ *     double Sfu_start_time_TC1[];
+ *     double Sfu_grant_TC1[];
+ *     double Sfu_start_time_TC2[];
+ *     double Sfu_grant_TC2[];
+ *     double Sfu_start_time_TC3[];
+ *     double Sfu_grant_TC3[];
+ * 
  *     //uint8_t AllocID;					// 14 bits
  *     //uint8_t Flags;					// 2 bits
  *     //uint8_t StartTime;				// 16 bits
@@ -49,6 +57,8 @@ class gtc_header;
  *     //uint8_t HEC;						// 13 bits
  * 
  *     int OnuID;
+ *     int SfuID;
+ *     int MfuID;
  *     double BufferOccupancyTC1 = 0;				// 24 bits
  *     double BufferOccupancyTC2 = 0;				// 24 bits
  *     double BufferOccupancyTC3 = 0;				// 24 bits
@@ -80,7 +90,23 @@ class gtc_header : public ::omnetpp::cPacket
     size_t Onu_start_time_TC3_arraysize = 0;
     double *Onu_grant_TC3 = nullptr;
     size_t Onu_grant_TC3_arraysize = 0;
+    double *Mfu_sfu_rtt = nullptr;
+    size_t Mfu_sfu_rtt_arraysize = 0;
+    double *Sfu_start_time_TC1 = nullptr;
+    size_t Sfu_start_time_TC1_arraysize = 0;
+    double *Sfu_grant_TC1 = nullptr;
+    size_t Sfu_grant_TC1_arraysize = 0;
+    double *Sfu_start_time_TC2 = nullptr;
+    size_t Sfu_start_time_TC2_arraysize = 0;
+    double *Sfu_grant_TC2 = nullptr;
+    size_t Sfu_grant_TC2_arraysize = 0;
+    double *Sfu_start_time_TC3 = nullptr;
+    size_t Sfu_start_time_TC3_arraysize = 0;
+    double *Sfu_grant_TC3 = nullptr;
+    size_t Sfu_grant_TC3_arraysize = 0;
     int OnuID = 0;
+    int SfuID = 0;
+    int MfuID = 0;
     double BufferOccupancyTC1 = 0;
     double BufferOccupancyTC2 = 0;
     double BufferOccupancyTC3 = 0;
@@ -170,8 +196,77 @@ class gtc_header : public ::omnetpp::cPacket
     virtual void appendOnu_grant_TC3(double Onu_grant_TC3);
     virtual void eraseOnu_grant_TC3(size_t k);
 
+    virtual void setMfu_sfu_rttArraySize(size_t size);
+    virtual size_t getMfu_sfu_rttArraySize() const;
+    virtual double getMfu_sfu_rtt(size_t k) const;
+    virtual void setMfu_sfu_rtt(size_t k, double Mfu_sfu_rtt);
+    virtual void insertMfu_sfu_rtt(size_t k, double Mfu_sfu_rtt);
+    [[deprecated]] void insertMfu_sfu_rtt(double Mfu_sfu_rtt) {appendMfu_sfu_rtt(Mfu_sfu_rtt);}
+    virtual void appendMfu_sfu_rtt(double Mfu_sfu_rtt);
+    virtual void eraseMfu_sfu_rtt(size_t k);
+
+    virtual void setSfu_start_time_TC1ArraySize(size_t size);
+    virtual size_t getSfu_start_time_TC1ArraySize() const;
+    virtual double getSfu_start_time_TC1(size_t k) const;
+    virtual void setSfu_start_time_TC1(size_t k, double Sfu_start_time_TC1);
+    virtual void insertSfu_start_time_TC1(size_t k, double Sfu_start_time_TC1);
+    [[deprecated]] void insertSfu_start_time_TC1(double Sfu_start_time_TC1) {appendSfu_start_time_TC1(Sfu_start_time_TC1);}
+    virtual void appendSfu_start_time_TC1(double Sfu_start_time_TC1);
+    virtual void eraseSfu_start_time_TC1(size_t k);
+
+    virtual void setSfu_grant_TC1ArraySize(size_t size);
+    virtual size_t getSfu_grant_TC1ArraySize() const;
+    virtual double getSfu_grant_TC1(size_t k) const;
+    virtual void setSfu_grant_TC1(size_t k, double Sfu_grant_TC1);
+    virtual void insertSfu_grant_TC1(size_t k, double Sfu_grant_TC1);
+    [[deprecated]] void insertSfu_grant_TC1(double Sfu_grant_TC1) {appendSfu_grant_TC1(Sfu_grant_TC1);}
+    virtual void appendSfu_grant_TC1(double Sfu_grant_TC1);
+    virtual void eraseSfu_grant_TC1(size_t k);
+
+    virtual void setSfu_start_time_TC2ArraySize(size_t size);
+    virtual size_t getSfu_start_time_TC2ArraySize() const;
+    virtual double getSfu_start_time_TC2(size_t k) const;
+    virtual void setSfu_start_time_TC2(size_t k, double Sfu_start_time_TC2);
+    virtual void insertSfu_start_time_TC2(size_t k, double Sfu_start_time_TC2);
+    [[deprecated]] void insertSfu_start_time_TC2(double Sfu_start_time_TC2) {appendSfu_start_time_TC2(Sfu_start_time_TC2);}
+    virtual void appendSfu_start_time_TC2(double Sfu_start_time_TC2);
+    virtual void eraseSfu_start_time_TC2(size_t k);
+
+    virtual void setSfu_grant_TC2ArraySize(size_t size);
+    virtual size_t getSfu_grant_TC2ArraySize() const;
+    virtual double getSfu_grant_TC2(size_t k) const;
+    virtual void setSfu_grant_TC2(size_t k, double Sfu_grant_TC2);
+    virtual void insertSfu_grant_TC2(size_t k, double Sfu_grant_TC2);
+    [[deprecated]] void insertSfu_grant_TC2(double Sfu_grant_TC2) {appendSfu_grant_TC2(Sfu_grant_TC2);}
+    virtual void appendSfu_grant_TC2(double Sfu_grant_TC2);
+    virtual void eraseSfu_grant_TC2(size_t k);
+
+    virtual void setSfu_start_time_TC3ArraySize(size_t size);
+    virtual size_t getSfu_start_time_TC3ArraySize() const;
+    virtual double getSfu_start_time_TC3(size_t k) const;
+    virtual void setSfu_start_time_TC3(size_t k, double Sfu_start_time_TC3);
+    virtual void insertSfu_start_time_TC3(size_t k, double Sfu_start_time_TC3);
+    [[deprecated]] void insertSfu_start_time_TC3(double Sfu_start_time_TC3) {appendSfu_start_time_TC3(Sfu_start_time_TC3);}
+    virtual void appendSfu_start_time_TC3(double Sfu_start_time_TC3);
+    virtual void eraseSfu_start_time_TC3(size_t k);
+
+    virtual void setSfu_grant_TC3ArraySize(size_t size);
+    virtual size_t getSfu_grant_TC3ArraySize() const;
+    virtual double getSfu_grant_TC3(size_t k) const;
+    virtual void setSfu_grant_TC3(size_t k, double Sfu_grant_TC3);
+    virtual void insertSfu_grant_TC3(size_t k, double Sfu_grant_TC3);
+    [[deprecated]] void insertSfu_grant_TC3(double Sfu_grant_TC3) {appendSfu_grant_TC3(Sfu_grant_TC3);}
+    virtual void appendSfu_grant_TC3(double Sfu_grant_TC3);
+    virtual void eraseSfu_grant_TC3(size_t k);
+
     virtual int getOnuID() const;
     virtual void setOnuID(int OnuID);
+
+    virtual int getSfuID() const;
+    virtual void setSfuID(int SfuID);
+
+    virtual int getMfuID() const;
+    virtual void setMfuID(int MfuID);
 
     virtual double getBufferOccupancyTC1() const;
     virtual void setBufferOccupancyTC1(double BufferOccupancyTC1);

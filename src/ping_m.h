@@ -23,6 +23,7 @@ class ping;
  * message ping
  * {
  *     int ONU_id;
+ *     int SFU_id;
  * }
  * </pre>
  */
@@ -30,6 +31,7 @@ class ping : public ::omnetpp::cMessage
 {
   protected:
     int ONU_id = 0;
+    int SFU_id = 0;
 
   private:
     void copy(const ping& other);
@@ -48,6 +50,9 @@ class ping : public ::omnetpp::cMessage
 
     virtual int getONU_id() const;
     virtual void setONU_id(int ONU_id);
+
+    virtual int getSFU_id() const;
+    virtual void setSFU_id(int SFU_id);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const ping& obj) {obj.parsimPack(b);}

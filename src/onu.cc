@@ -41,8 +41,8 @@ class ONU : public cSimpleModule
         double gtc_hdr_sz = 0;
         long seqID;
 
-        simsignal_t latencySignalXr;
-        simsignal_t latencySignalBkg;
+        //simsignal_t latencySignalXr;
+        //simsignal_t latencySignalBkg;
 
     public:
         virtual ~ONU();
@@ -57,8 +57,8 @@ Define_Module(ONU);
 
 void ONU::initialize()
 {
-    latencySignalXr = registerSignal("xr_latency");  // registering the signal
-    latencySignalBkg = registerSignal("bkg_latency");
+    //latencySignalXr = registerSignal("xr_latency");  // registering the signal
+    //latencySignalBkg = registerSignal("bkg_latency");
 
     queue_TC1.setName("queue_TC1");
     queue_TC2.setName("queue_TC2");
@@ -66,8 +66,7 @@ void ONU::initialize()
     gtc_dl_queue.setName("gtc_dl_queue");
     capacity = onu_buffer_capacity;
 
-    gate("inSrc_bkg")->setDeliverImmediately(true);
-    gate("inSrc_xr")->setDeliverImmediately(true);
+    gate("inMFU")->setDeliverImmediately(true);
     gate("SpltGate_i")->setDeliverImmediately(true);
 }
 
@@ -101,6 +100,7 @@ void ONU::handleMessage(cMessage *msg)
                 //EV << "[onu" << getIndex() << "] Packet arrived from source and being queued at ONU" << endl;
                 queue_TC3.insert(pkt);
                 pending_buffer_TC3 += pkt->getByteLength();
+
                 //EV << "[onu" << getIndex() << "] Current TC3 queue length = " << queue_TC3.getLength() << " at ONU = " << getIndex() <<endl;
                 //EV << "[onu" << getIndex() << "] Current buffer length = " << pending_buffer_TC3 << " at ONU = " << getIndex() <<endl;
             }
@@ -113,9 +113,13 @@ void ONU::handleMessage(cMessage *msg)
                 pkt->setOnuArrivalTime(simTime());
                 pkt->setOnuId(getIndex());
                 pkt->setTContId(2);             // for TC-2
+                //pkt->setTContId(3);             // for TC-3
                 //EV << "[onu" << getIndex() << "] Packet arrived from source and being queued at ONU" << endl;
                 queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
                 pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
                 //EV << "[onu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at ONU = " << getIndex() <<endl;
                 //EV << "[onu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at ONU = " << getIndex() <<endl;
             }
@@ -174,7 +178,7 @@ void ONU::handleMessage(cMessage *msg)
             EV << "[onu" << getIndex() << "] Sending gtc_hdr_ul from ONU-" << getIndex() << " at = " << simTime() << " for seqID = " << seqID << endl;
             send(gtc_hdr_ul,"SpltGate_o");
 
-            simtime_t Txtime = (simtime_t)(gtc_hdr_ul->getBitLength()/pon_link_datarate);
+            simtime_t Txtime = (simtime_t)(gtc_hdr_ul->getBitLength()/ext_pon_link_datarate);
 
             cMessage *send_ul_payload = new cMessage("send_ul_payload_TC2");            // send uplink data
             scheduleAt(gtc_hdr_ul->getSendingTime()+Txtime, send_ul_payload);
@@ -198,10 +202,10 @@ void ONU::handleMessage(cMessage *msg)
 
                         double xr_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
                         //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
-                        emit(latencySignalXr, xr_packet_latency);
+                        //emit(latencySignalXr, xr_packet_latency);
 
                         // rescheduling send_ul_payload to send the consecutive queued packets
-                        simtime_t Txtime = (simtime_t)(data->getBitLength()/pon_link_datarate);
+                        simtime_t Txtime = (simtime_t)(data->getBitLength()/ext_pon_link_datarate);
                         scheduleAt(data->getSendingTime()+Txtime,msg);
                         //EV << "[onu" << getIndex() << "] send_ul_payload re-scheduled!" << endl;
                     }
@@ -231,18 +235,19 @@ void ONU::handleMessage(cMessage *msg)
                             pending_buffer_TC2 = std::max(0.0,pending_buffer_TC2 - onu_grant_TC2);
                             onu_grant_TC2 = 0;          // grant exhausted!
 
-                            /*double xr_packet_latency = copy->getOnuDepartureTime().dbl() - copy->getOnuArrivalTime().dbl();
+                            //double xr_packet_latency = copy->getOnuDepartureTime().dbl() - copy->getOnuArrivalTime().dbl();
                             //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
-                            emit(latencySignalXr, xr_packet_latency);*/
+                            //emit(latencySignalXr, xr_packet_latency);
 
                             //delete msg;   // cleaning up packetSend msg
-                            simtime_t Txtime = (simtime_t)(copy->getBitLength()/pon_link_datarate);
+                            simtime_t Txtime = (simtime_t)(copy->getBitLength()/ext_pon_link_datarate);
                             scheduleAt(copy->getSendingTime()+Txtime,msg);
                             EV << "[onu" << getIndex() << "] 246 ul TC2 transmission finished at: " << simTime() << " for seqID = " << seqID << endl;
                         }
                     }
                 }
                 else {
+                    delete msg;
                     EV << "[onu" << getIndex() << "] queue_TC2 is empty at: " << simTime() << endl;
                 }
             }
@@ -270,13 +275,20 @@ void ONU::handleMessage(cMessage *msg)
                         send(data,"SpltGate_o");
                         data->setOnuDepartureTime(data->getSendingTime());
 
-                        double bkg_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
-                        //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
-                        emit(latencySignalBkg, bkg_packet_latency);
+                        if(strcmp(data->getName(),"bkg_data") == 0) {
+                            double bkg_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
+                            //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
+                            //emit(latencySignalBkg, bkg_packet_latency);
+                        }
+                        /*if(strcmp(data->getName(),"xr_data") == 0) {
+                            double xr_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
+                            //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
+                            emit(latencySignalXr, xr_packet_latency);
+                        }*/
 
                         // rescheduling send_ul_payload to send the consecutive queued packets
                         if(pending_buffer_TC3 > 0) {
-                            simtime_t Txtime = (simtime_t)(data->getBitLength()/pon_link_datarate);
+                            simtime_t Txtime = (simtime_t)(data->getBitLength()/ext_pon_link_datarate);
                             scheduleAt(data->getSendingTime()+Txtime,msg);
                             //EV << "[onu" << getIndex() << "] send_ul_payload re-scheduled!" << endl;
                         }
@@ -311,9 +323,16 @@ void ONU::handleMessage(cMessage *msg)
                             pending_buffer_TC3 = std::max(0.0,pending_buffer_TC3 - onu_grant_TC3);
                             onu_grant_TC3 = 0;          // grant exhausted!
 
-                            /*double bkg_packet_latency = copy->getOnuDepartureTime().dbl() - copy->getOnuArrivalTime().dbl();
-                            //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
-                            emit(latencySignalBkg, bkg_packet_latency);*/
+                            /*if(strcmp(data->getName(),"bkg_data") == 0) {
+                                double bkg_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
+                                //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
+                                emit(latencySignalBkg, bkg_packet_latency);
+                            }
+                            if(strcmp(data->getName(),"xr_data") == 0) {
+                                double xr_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
+                                //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
+                                emit(latencySignalXr, xr_packet_latency);
+                            }*/
 
                             delete msg;   // cleaning up packetSend msg
                             EV << "[onu" << getIndex() << "] deleting msg @ 320" << endl;

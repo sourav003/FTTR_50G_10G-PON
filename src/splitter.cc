@@ -26,6 +26,7 @@ class Splitter : public cSimpleModule
         cQueue olt_queue;            // Queue for packets to be sent to OLT
         double onu_queue_size;
         double olt_queue_size;
+        double pon_datarate;
 
     protected:
        // The following redefined virtual function holds the algorithm.
@@ -41,6 +42,13 @@ void Splitter::initialize()
     olt_queue.setName("olt_queue");
     olt_queue_size = 0;
     onu_queue_size = 0;
+
+    cGate *g = gate("OltGate_o");                   // get the gate
+    cChannel *ch = g->getChannel();                 // get the channel object
+    if (ch != nullptr) {
+        double pon_datarate = ch->par("datarate").doubleValue();  // in bits per second
+    }
+
     // Make sure incoming message is delivered immediately
     gate("OltGate_i")->setDeliverImmediately(true);
     int n = gateSize("OnuGate_o");
@@ -72,7 +80,7 @@ void Splitter::handleMessage(cMessage *msg)
                         onu_queue.insert(copy);
 
                         cMessage *onu_tx = new cMessage("ONU_Tx_Delay");
-                        scheduleAt(onu_ch->getTransmissionFinishTime()+(simtime_t)(onu_queue_size*8/pon_link_datarate),onu_tx);
+                        scheduleAt(onu_ch->getTransmissionFinishTime()+(simtime_t)(onu_queue_size*8/pon_datarate),onu_tx);
                         onu_queue_size += copy->getByteLength();
                     }
                 }
@@ -93,9 +101,9 @@ void Splitter::handleMessage(cMessage *msg)
                     olt_queue.insert(pkt);
 
                     cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
-                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_link_datarate),olt_tx);
+                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
                     olt_queue_size += pkt->getByteLength();
-                    EV << "[splt] gtc_hdr_ul queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_link_datarate) << ", Queue size = " << olt_queue_size << endl;
+                    EV << "[splt] gtc_hdr_ul queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
                 }
 
                 if ((strcmp(msg->getName(), "bkg_data") == 0)||(strcmp(msg->getName(), "xr_data") == 0)) {
@@ -103,9 +111,9 @@ void Splitter::handleMessage(cMessage *msg)
                     olt_queue.insert(pkt);
 
                     cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
-                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_link_datarate),olt_tx);
+                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
                     olt_queue_size += pkt->getByteLength();
-                    EV << "[splt] bkg_data queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_link_datarate) << ", Queue size = " << olt_queue_size << endl;
+                    EV << "[splt] bkg_data queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
                 }
             }
         }

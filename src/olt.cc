@@ -92,7 +92,7 @@ void OLT::initialize()
 
     ping *png = new ping("ping");      // sending ping message at T = 0 for finding the RTT of all ONUs
     send(png,"SpltGate_o");
-    //EV << "[olt] Sending ping from OLT" << endl;
+    EV << "[olt] Sending ping from OLT at = " << simTime() << endl;
 }
 
 void OLT::handleMessage(cMessage *msg)
@@ -144,7 +144,7 @@ void OLT::handleMessage(cMessage *msg)
                 cMessage *schedule_dl_gtc = new cMessage("schedule_dl_gtc");
                 scheduleAt(simTime(), schedule_dl_gtc);           // when ping from all ONUs arrive, initiate the grant scheduling process
 
-                onu_max_grant = floor((max_polling_cycle - T_guard*onus)*(pon_link_datarate/onus)/8);  // in Bytes
+                onu_max_grant = floor((max_polling_cycle - T_guard*onus)*(ext_pon_link_datarate/onus)/8);  // in Bytes
                 //EV << "[olt] worst_rtt = " << worst_rtt << ", onu_max_grant = " << onu_max_grant << endl;
                 for(int i = 0;i<onus;i++) {
                     onu_grant_TC3[i] = onu_max_grant;       // initializing all ONUs with maximum grant value
@@ -179,9 +179,9 @@ void OLT::handleMessage(cMessage *msg)
             double onu_max_grant_TC3 = onu_max_grant;
 
             for(int i = 0;i<onus;i++) {
-                if(onu_buffer_TC2[i] > 0) {                     // adjust priorities if TC-2 traffic is present
-                    onu_max_grant_TC2 = 0.8*onu_max_grant;
-                    onu_max_grant_TC3 = 0.2*onu_max_grant;
+                if((onu_buffer_TC2[i] > 0)||(onu_buffer_TC3[i] > 0)) {                     // adjust priorities if TC-2 traffic is present
+                    onu_max_grant_TC2 = (onu_buffer_TC2[i]/(onu_buffer_TC2[i]+onu_buffer_TC3[i]))*onu_max_grant;
+                    onu_max_grant_TC3 = (1-(onu_buffer_TC2[i]/(onu_buffer_TC2[i]+onu_buffer_TC3[i])))*onu_max_grant;
                 }
 
                 onu_grant_TC2[i] = std::min(onu_buffer_TC2[i],onu_max_grant_TC2);      // granting BW using limited service policy
@@ -194,16 +194,16 @@ void OLT::handleMessage(cMessage *msg)
                 gtc_hdr_dl->setOnu_start_time_TC2(i, onu_start_time_TC2[i]);
                 gtc_hdr_dl->setOnu_grant_TC2(i, onu_grant_TC2[i]);
                 // filling into the header packet for T-CONT 3
-                onu_start_time_TC3[i] = tx_start + T_guard + (onu_grant_TC2[i]*8/pon_link_datarate);
+                onu_start_time_TC3[i] = tx_start + T_guard + (onu_grant_TC2[i]*8/ext_pon_link_datarate);
                 gtc_hdr_dl->setOnu_start_time_TC3(i, onu_start_time_TC3[i]);
                 gtc_hdr_dl->setOnu_grant_TC3(i, onu_grant_TC3[i]);
                 // shifting the tx_start cursor
-                tx_start += T_guard + (onu_grant_TC2[i]*8/pon_link_datarate) + (onu_grant_TC3[i]*8/pon_link_datarate);
+                tx_start += T_guard + (onu_grant_TC2[i]*8/ext_pon_link_datarate) + (onu_grant_TC3[i]*8/ext_pon_link_datarate);
 
                 EV << "[olt] onu_start_time_TC2[" << i << "] = " << simTime().dbl()+2*125e-6+onu_start_time_TC2[i]-(worst_rtt/2) << " for seqID = " << seqID << endl;
                 EV << "[olt] onu_start_time_TC3[" << i << "] = " << simTime().dbl()+2*125e-6+onu_start_time_TC3[i]-(worst_rtt/2) << " for seqID = " << seqID << endl;
             }
-            EV << "[olt] last ONU tx finish time = " << simTime().dbl()+2*125e-6+onu_start_time_TC3[onus-1]-(worst_rtt/2)+(onu_grant_TC3[onus-1]*8/pon_link_datarate) << " for seqID = " << seqID << endl;
+            EV << "[olt] last ONU tx finish time = " << simTime().dbl()+2*125e-6+onu_start_time_TC3[onus-1]-(worst_rtt/2)+(onu_grant_TC3[onus-1]*8/ext_pon_link_datarate) << " for seqID = " << seqID << endl;
 
             send(gtc_hdr_dl,"SpltGate_o");          // sending the downlink GTC header to ONUs
 

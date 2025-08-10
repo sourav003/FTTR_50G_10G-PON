@@ -1,7 +1,7 @@
 /*
- * source.cc
+ * source_hpt.cc
  *
- *  Created on: 30 July 2025
+ *  Created on: 8 Aug 2025
  *      Author: mondals
  */
 
@@ -27,7 +27,7 @@ using namespace omnetpp;
  * a new packet. Immediately the packet is transmitted to the corresponding ONU.
  */
 
-class XR_Device : public cSimpleModule
+class Haptic_Device : public cSimpleModule
 {
     private:
         double avgFrameSize;
@@ -40,7 +40,7 @@ class XR_Device : public cSimpleModule
         //simsignal_t arrivalSignal;               // to send signals for statistics collection
 
     public:
-        virtual ~XR_Device();
+        virtual ~Haptic_Device();
 
     protected:
         // The following redefined virtual function holds the algorithm.
@@ -50,14 +50,14 @@ class XR_Device : public cSimpleModule
 };
 
 // The module class needs to be registered with OMNeT++
-Define_Module(XR_Device);
+Define_Module(Haptic_Device);
 
-XR_Device::~XR_Device()
+Haptic_Device::~Haptic_Device()
 {
     cancelAndDelete(generateEvent);
 }
 
-void XR_Device::initialize()
+void Haptic_Device::initialize()
 {
     //arrivalSignal = registerSignal("generation");               // registering the signal
 
@@ -95,7 +95,7 @@ void XR_Device::initialize()
     scheduleAt(simTime()+pkt_interval, generateEvent);          // scheduling the next packet generation
 }
 
-void XR_Device::handleMessage(cMessage *msg)
+void Haptic_Device::handleMessage(cMessage *msg)
 {
     if(strcmp(msg->getName(),"generateEvent") == 0) {
         double frameSize = truncnormal(avgFrameSize, 0.105*avgFrameSize);
@@ -128,7 +128,7 @@ void XR_Device::handleMessage(cMessage *msg)
     }
 }
 
-ethPacket *XR_Device::generateNewPacket()
+ethPacket *Haptic_Device::generateNewPacket()
 {
     ethPacket *pkt = new ethPacket("xr_data");
     pkt->setByteLength(pkt_size);                              // generating packets of same size

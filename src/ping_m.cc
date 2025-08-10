@@ -176,18 +176,21 @@ ping& ping::operator=(const ping& other)
 void ping::copy(const ping& other)
 {
     this->ONU_id = other.ONU_id;
+    this->SFU_id = other.SFU_id;
 }
 
 void ping::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
     doParsimPacking(b,this->ONU_id);
+    doParsimPacking(b,this->SFU_id);
 }
 
 void ping::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
     doParsimUnpacking(b,this->ONU_id);
+    doParsimUnpacking(b,this->SFU_id);
 }
 
 int ping::getONU_id() const
@@ -200,12 +203,23 @@ void ping::setONU_id(int ONU_id)
     this->ONU_id = ONU_id;
 }
 
+int ping::getSFU_id() const
+{
+    return this->SFU_id;
+}
+
+void ping::setSFU_id(int SFU_id)
+{
+    this->SFU_id = SFU_id;
+}
+
 class pingDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
         FIELD_ONU_id,
+        FIELD_SFU_id,
     };
   public:
     pingDescriptor();
@@ -272,7 +286,7 @@ const char *pingDescriptor::getProperty(const char *propertyName) const
 int pingDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 1+base->getFieldCount() : 1;
+    return base ? 2+base->getFieldCount() : 2;
 }
 
 unsigned int pingDescriptor::getFieldTypeFlags(int field) const
@@ -285,8 +299,9 @@ unsigned int pingDescriptor::getFieldTypeFlags(int field) const
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,    // FIELD_ONU_id
+        FD_ISEDITABLE,    // FIELD_SFU_id
     };
-    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
 }
 
 const char *pingDescriptor::getFieldName(int field) const
@@ -299,8 +314,9 @@ const char *pingDescriptor::getFieldName(int field) const
     }
     static const char *fieldNames[] = {
         "ONU_id",
+        "SFU_id",
     };
-    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldNames[field] : nullptr;
 }
 
 int pingDescriptor::findField(const char *fieldName) const
@@ -308,6 +324,7 @@ int pingDescriptor::findField(const char *fieldName) const
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
     if (strcmp(fieldName, "ONU_id") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "SFU_id") == 0) return baseIndex + 1;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -321,8 +338,9 @@ const char *pingDescriptor::getFieldTypeString(int field) const
     }
     static const char *fieldTypeStrings[] = {
         "int",    // FIELD_ONU_id
+        "int",    // FIELD_SFU_id
     };
-    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **pingDescriptor::getFieldPropertyNames(int field) const
@@ -406,6 +424,7 @@ std::string pingDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int f
     ping *pp = omnetpp::fromAnyPtr<ping>(object); (void)pp;
     switch (field) {
         case FIELD_ONU_id: return long2string(pp->getONU_id());
+        case FIELD_SFU_id: return long2string(pp->getSFU_id());
         default: return "";
     }
 }
@@ -423,6 +442,7 @@ void pingDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, i
     ping *pp = omnetpp::fromAnyPtr<ping>(object); (void)pp;
     switch (field) {
         case FIELD_ONU_id: pp->setONU_id(string2long(value)); break;
+        case FIELD_SFU_id: pp->setSFU_id(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ping'", field);
     }
 }
@@ -438,6 +458,7 @@ omnetpp::cValue pingDescriptor::getFieldValue(omnetpp::any_ptr object, int field
     ping *pp = omnetpp::fromAnyPtr<ping>(object); (void)pp;
     switch (field) {
         case FIELD_ONU_id: return pp->getONU_id();
+        case FIELD_SFU_id: return pp->getSFU_id();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'ping' as cValue -- field index out of range?", field);
     }
 }
@@ -455,6 +476,7 @@ void pingDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, co
     ping *pp = omnetpp::fromAnyPtr<ping>(object); (void)pp;
     switch (field) {
         case FIELD_ONU_id: pp->setONU_id(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_SFU_id: pp->setSFU_id(omnetpp::checked_int_cast<int>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'ping'", field);
     }
 }
