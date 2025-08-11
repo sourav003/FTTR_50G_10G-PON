@@ -17,9 +17,10 @@ simple Background_Device
 {
     parameters:
         @display("i=device/pc");
-        double load = default(0.3);						// this will vary as 0.05:0.05:1
+        double load = default(0.3);										// this will vary as 0.1:0.1:1
         //double dataRate = default((50e9-360e6*16)/16);				//max datarate in bps
-        double dataRate = default(50e9/(16*8));
+        double dataRate = default(50e9/(16*8*3));
+        //double dataRate = default(100e6);
 
         //@signal[generation](type="double");
         //@statistic[pkt_interval](title="packet inter-arrival time"; source="generation"; record=vector,stats; interpolationmode=none);
@@ -32,8 +33,8 @@ simple XR_Device
 {
     parameters:
         @display("i=device/xr");
-        double frameRate = default(60);		                    // default framerate of XR = 60 fps (can be 90, 120 fps)
-        double dataRate = default(40e6);				        	// for 2K@60fps = 40 Mbps, for 4K@60fps = 90 Mbps, for 8K@60fps = 360 Mbps, for 16K@60 fps = 440 Mbps
+        double frameRate = default(60);		            // default framerate of XR = 60 fps (can be 90, 120 fps)
+        double dataRate = default(90e6);				// for 2K@60fps = 40 Mbps, for 4K@60fps = 90 Mbps, for 8K@60fps = 360 Mbps, for 16K@60 fps = 440 Mbps
 
         //@signal[generation](type="double");
         //@statistic[pkt_interval](title="packet inter-arrival time"; source="generation"; record=vector,stats; interpolationmode=none);
@@ -47,8 +48,8 @@ simple HMD_Device
 {
     parameters:
         @display("i=block/user");
-        double frameRate = default(60);		                    // default framerate of XR = 60 fps (can be 90, 120 fps)
-        double dataRate = default(40e6);				        	// for 2K@60fps = 40 Mbps, for 4K@60fps = 90 Mbps, for 8K@60fps = 360 Mbps, for 16K@60 fps = 440 Mbps
+        double meanPacketSize = default(100);			    // very small value - assuming to be 100 Bytes 
+        double sampleRate = default(1/15);				    // default inter-sample time = 15 ms
 
         //@signal[generation](type="double");
         //@statistic[pkt_interval](title="packet inter-arrival time"; source="generation"; record=vector,stats; interpolationmode=none);
@@ -62,8 +63,8 @@ simple Control_Device
 {
     parameters:
         @display("i=device/gloves");
-        double frameRate = default(60);		                    // default framerate of XR = 60 fps (can be 90, 120 fps)
-        double dataRate = default(40e6);				        	// for 2K@60fps = 40 Mbps, for 4K@60fps = 90 Mbps, for 8K@60fps = 360 Mbps, for 16K@60 fps = 440 Mbps
+        double meanPacketSize = default(1500);			    // very small value - assuming to be 1500 Bytes 
+        double sampleRate = default(1/10);				    // default inter-sample time = 11 ms following Gaussian distribution
 
         //@signal[generation](type="double");
         //@statistic[pkt_interval](title="packet inter-arrival time"; source="generation"; record=vector,stats; interpolationmode=none);
@@ -77,8 +78,8 @@ simple Haptic_Device
 {
     parameters:
         @display("i=device/robot_arm");
-        double frameRate = default(60);		                    // default framerate of XR = 60 fps (can be 90, 120 fps)
-        double dataRate = default(40e6);				        	// for 2K@60fps = 40 Mbps, for 4K@60fps = 90 Mbps, for 8K@60fps = 360 Mbps, for 16K@60 fps = 440 Mbps
+        double meanPacketSize = default(1000);			    // very small value - assuming to be 100 Bytes 
+        double sampleRate = default(1/10);				    // default inter-sample time = 11 ms following Generalized Pareto distribution
 
         //@signal[generation](type="double");
         //@statistic[pkt_interval](title="packet inter-arrival time"; source="generation"; record=vector,stats; interpolationmode=none);
@@ -101,20 +102,24 @@ simple WiFi_AP
         input SrcHmd_in;
         input SrcHpt_in;
         input SrcCtr_in;
-        input SrcBkg_in;
+        input SrcBkg1_in;
+        input SrcBkg2_in;
+        input SrcBkg3_in;
 
         output SrcXr_out;
         output SrcHmd_out;
         output SrcHpt_out;
         output SrcCtr_out;
-        output SrcBkg_out;
+        output SrcBkg1_out;
+        output SrcBkg2_out;
+        output SrcBkg3_out;
 }
 
 simple SFU
 {
     parameters:
-        @signal[bkg_latency](type="double");
-        @statistic[bkg_packet_latency](title="Background packet latency at ONU"; source="bkg_latency"; record=vector,stats; interpolationmode=none);
+        //@signal[bkg_latency](type="double");
+        //@statistic[bkg_packet_latency](title="Background packet latency at ONU"; source="bkg_latency"; record=vector,stats; interpolationmode=none);
         //@signal[xr_latency](type="double");
         //@statistic[xr_packet_latency](title="XR packet latency at ONU"; source="xr_latency"; record=vector,stats; interpolationmode=none);
 
@@ -145,6 +150,17 @@ simple OLT
         @display("i=device/lan-ring_vl");
         int NumberOfONUs = default(2);
         double ber = default(1e-9);  						// bit error rate
+
+        @signal[bkg_latency](type="double");
+        @statistic[bkg_packet_latency](title="Background packet latency at ONU"; source="bkg_latency"; record=vector,stats; interpolationmode=none);
+        @signal[xr_latency](type="double");
+        @statistic[xr_packet_latency](title="XR packet latency at ONU"; source="xr_latency"; record=vector,stats; interpolationmode=none);
+        @signal[hmd_latency](type="double");
+        @statistic[hmd_packet_latency](title="HMD packet latency at ONU"; source="hmd_latency"; record=vector,stats; interpolationmode=none);
+        @signal[ctrl_latency](type="double");
+        @statistic[ctrl_packet_latency](title="Control packet latency at ONU"; source="ctrl_latency"; record=vector,stats; interpolationmode=none);
+        @signal[hptc_latency](type="double");
+        @statistic[hptc_packet_latency](title="Haptic packet latency at ONU"; source="hptc_latency"; record=vector,stats; interpolationmode=none);
 
     gates:
         input SpltGate_i;
@@ -179,8 +195,9 @@ simple Splitter
 network FTTR_50G_10GPON
 {
     parameters:
-        int NumberOfONUs = default(1);
-        int NumberOfSFUs = default(1);
+        int NumberOfONUs = default(2);
+        int NumberOfSFUs = default(2);
+        int NumberOfXRs = int(this.NumberOfSFUs/2);
 
     types:
         channel FTTR_Channel extends ned.DatarateChannel
@@ -220,9 +237,28 @@ network FTTR_50G_10GPON
         waps[this.NumberOfONUs*this.NumberOfSFUs]: WiFi_AP {
             @display("p=1016,133,c");
         }
-        bkgs[this.NumberOfONUs*this.NumberOfSFUs]: Background_Device {
-            @display("p=1202,36,c");
+        xrs[this.NumberOfONUs*this.NumberOfXRs]: XR_Device {
+            @display("p=1202,34,c");
         }
+        hmds[this.NumberOfONUs*this.NumberOfXRs]: HMD_Device {
+            @display("p=1362,166,c");
+        }
+        controls[this.NumberOfONUs*this.NumberOfXRs]: Control_Device {
+            @display("p=1448,240,c");
+        }
+        haptics[this.NumberOfONUs*this.NumberOfXRs]: Haptic_Device {
+            @display("p=1275,100,c");
+        }
+        bkgs1[this.NumberOfONUs*this.NumberOfSFUs]: Background_Device {
+            @display("p=1530,317,c");
+        }
+        bkgs2[this.NumberOfONUs*this.NumberOfSFUs]: Background_Device {
+            @display("p=1603,379,c");
+        }
+        bkgs3[this.NumberOfONUs*this.NumberOfSFUs]: Background_Device {
+            @display("p=1682,440,c");
+        }
+
     connections allowunconnected:
         // OLT-Splitter connections
         olt.SpltGate_o --> FTTH_Channel --> splitter_ext.OltGate_i;								// OLT-Splitter connections
@@ -245,11 +281,26 @@ network FTTR_50G_10GPON
             sfus[j].inWap <-- waps[j].Sfu_out;
             sfus[j].outWap --> waps[j].Sfu_in;
 
-            waps[j].SrcBkg_in <-- bkgs[j].out;
-            waps[j].SrcBkg_out --> bkgs[j].in;
+            waps[j].SrcBkg1_in <-- bkgs1[j].out;													// connecting background devices to WAPs
+            waps[j].SrcBkg1_out --> bkgs1[j].in;
+            waps[j].SrcBkg2_in <-- bkgs2[j].out;
+            waps[j].SrcBkg2_out --> bkgs2[j].in;
+            waps[j].SrcBkg3_in <-- bkgs3[j].out;
+            waps[j].SrcBkg3_out --> bkgs3[j].in;
         }
+        for j=0..(this.NumberOfONUs*this.NumberOfSFUs-1) {
+            waps[j].SrcXr_in <-- xrs[int(floor(j/2))].out if (int(j%2)==0);
+            waps[j].SrcXr_out --> xrs[int(floor(j/2))].in if (int(j%2)==0);
 
+            waps[j].SrcHpt_in <-- haptics[int(floor(j/2))].out if (int(j%2)==0);
+            waps[j].SrcHpt_out --> haptics[int(floor(j/2))].in if (int(j%2)==0);
 
+            waps[j].SrcHmd_in <-- hmds[int(floor(j/2))].out if (int(j%2)==1);
+            waps[j].SrcHmd_out --> hmds[int(floor(j/2))].in if (int(j%2)==1);
+
+            waps[j].SrcCtr_in <-- controls[int(floor(j/2))].out if (int(j%2)==1);
+            waps[j].SrcCtr_out --> controls[int(floor(j/2))].in if (int(j%2)==1);
+        }
 }
 
 
