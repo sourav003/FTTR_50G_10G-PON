@@ -17,6 +17,8 @@ packet gtc_header extends cPacket
 {
     bool Downlink = false;
     bool Uplink = false;
+    bool Ext_pon = false;
+    bool Int_pon = false;
     
     //uint32_t PSync;					// 4 Bytes
     //uint32_t Ident;					// 4 Bytes

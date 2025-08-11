@@ -125,6 +125,63 @@ void ONU::handleMessage(cMessage *msg)
             }
             //delete pkt;
         }
+        else if(strcmp(msg->getName(),"hmd_data") == 0) {                    // background traffic is considered for T-CONT 3
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+            double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
+            if(buffer <= onu_buffer_capacity) {                         // queue the current packet if there is buffer capacity
+                pkt->setOnuArrivalTime(simTime());
+                pkt->setOnuId(getIndex());
+                pkt->setTContId(2);             // for TC-2
+                //pkt->setTContId(3);             // for TC-3
+                //EV << "[onu" << getIndex() << "] Packet arrived from source and being queued at ONU" << endl;
+                queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
+                pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
+                //EV << "[onu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at ONU = " << getIndex() <<endl;
+                //EV << "[onu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at ONU = " << getIndex() <<endl;
+            }
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"control_data") == 0) {                    // background traffic is considered for T-CONT 3
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+            double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
+            if(buffer <= onu_buffer_capacity) {                         // queue the current packet if there is buffer capacity
+                pkt->setOnuArrivalTime(simTime());
+                pkt->setOnuId(getIndex());
+                pkt->setTContId(2);             // for TC-2
+                //pkt->setTContId(3);             // for TC-3
+                //EV << "[onu" << getIndex() << "] Packet arrived from source and being queued at ONU" << endl;
+                queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
+                pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
+                //EV << "[onu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at ONU = " << getIndex() <<endl;
+                //EV << "[onu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at ONU = " << getIndex() <<endl;
+            }
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"haptic_data") == 0) {                    // background traffic is considered for T-CONT 3
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+            double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
+            if(buffer <= onu_buffer_capacity) {                         // queue the current packet if there is buffer capacity
+                pkt->setOnuArrivalTime(simTime());
+                pkt->setOnuId(getIndex());
+                pkt->setTContId(2);             // for TC-2
+                //pkt->setTContId(3);             // for TC-3
+                //EV << "[onu" << getIndex() << "] Packet arrived from source and being queued at ONU" << endl;
+                queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
+                pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
+                //EV << "[onu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at ONU = " << getIndex() <<endl;
+                //EV << "[onu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at ONU = " << getIndex() <<endl;
+            }
+            //delete pkt;
+        }
         else if(strcmp(msg->getName(),"gtc_hdr_dl") == 0) {
             gtc_header *pkt = check_and_cast<gtc_header *>(msg);
             simtime_t arr_time = pkt->getArrivalTime();
@@ -200,7 +257,7 @@ void ONU::handleMessage(cMessage *msg)
                         send(data,"SpltGate_o");
                         data->setOnuDepartureTime(data->getSendingTime());
 
-                        double xr_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
+                        //double xr_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
                         //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
                         //emit(latencySignalXr, xr_packet_latency);
 
@@ -276,7 +333,7 @@ void ONU::handleMessage(cMessage *msg)
                         data->setOnuDepartureTime(data->getSendingTime());
 
                         if(strcmp(data->getName(),"bkg_data") == 0) {
-                            double bkg_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
+                            //double bkg_packet_latency = data->getOnuDepartureTime().dbl() - data->getOnuArrivalTime().dbl();
                             //EV << "[onu" << getIndex() << "] packet_latency: " << packet_latency << endl;
                             //emit(latencySignalBkg, bkg_packet_latency);
                         }

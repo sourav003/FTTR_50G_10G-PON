@@ -30,11 +30,9 @@ using namespace omnetpp;
 class Control_Device : public cSimpleModule
 {
     private:
-        double avgFrameSize;
-        double avgDataRate;
+        double avgPacketSize;
         double ArrivalRate;
         double pkt_interval;                     // inter-packet generation interval
-        double pkt_size;
         cMessage *generateEvent = nullptr;       // holds pointer to the self-timeout message
 
         //simsignal_t arrivalSignal;               // to send signals for statistics collection
@@ -59,38 +57,22 @@ Control_Device::~Control_Device()
 
 void Control_Device::initialize()
 {
-    //arrivalSignal = registerSignal("generation");               // registering the signal
+    //arrivalSignal = registerSignal("generation");              // registering the signal
 
-    avgDataRate = par("dataRate");                              // get the load factor from NED file
-    ArrivalRate = par("frameRate");                             // get the max ONU datarate from NED file
+    avgPacketSize = par("meanPacketSize");                      // get the avg packet size from NED file
+    ArrivalRate   = par("sampleRate");                          // get the HMD location sample rate from NED file (1/11e-3 per sec)
 
     // Initialize variables
-    double mean = 1.0/ArrivalRate;
-    double std = 2e-3;                             // 10.5 % of mean
-    pkt_interval = truncnormal(mean, std);                       // packet inter-arrival times are generated following truncnormal distribution
+    double mean = 1e-3*(1.0/ArrivalRate);                       // mean = 10 ms
+    double std = 4e-3;                                          // sd = 4 ms
+    pkt_interval = truncnormal(mean, std);                      // packet inter-arrival times are generated following gaussian distribution
+
     generateEvent = new cMessage("generateEvent");              // self-message is generated for next packet generation
     //emit(arrivalSignal,pkt_interval);
 
-    avgFrameSize = avgDataRate/(8*ArrivalRate);                        // framesize = datarate (bps)/(8*fps)
-    double frameSize = truncnormal(avgFrameSize, 0.105*avgFrameSize);
-    //double frameSize = 0.5*avgFrameSize;
-
-    int num_pkts = ceil(frameSize/1500);
-    //EV << "[srcXR" << getIndex() << "] frame size = " << frameSize << ", num_pkts = "<< num_pkts << " and current time = " << simTime() << endl;
-
-    pkt_size = 64;
-    for(int i=1;i<num_pkts;i++){
-        pkt_size = 1542;
-        ethPacket *pkt = generateNewPacket();                       // generating the first packet at T = 0
-        send(pkt,"out");
-        //EV << "[srcXR" << getIndex() << "] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
-    }
-    // sending the last packet
-    int pending = ceil(frameSize-(num_pkts-1)*1500);
-    pkt_size = min(1500,pending)+42;
     ethPacket *pkt = generateNewPacket();                       // generating the first packet at T = 0
     send(pkt,"out");
-    //EV << "[srcXR" << getIndex() << "] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
+    //EV << "[srcCtr] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
 
     scheduleAt(simTime()+pkt_interval, generateEvent);          // scheduling the next packet generation
 }
@@ -98,42 +80,24 @@ void Control_Device::initialize()
 void Control_Device::handleMessage(cMessage *msg)
 {
     if(strcmp(msg->getName(),"generateEvent") == 0) {
-        double frameSize = truncnormal(avgFrameSize, 0.105*avgFrameSize);
-        //double frameSize = 0.5*avgFrameSize;
-        //EV << "[srcXR" << getIndex() << "] frame size = " << frameSize << " and current time = " << simTime() << endl;
-        int num_pkts = ceil(frameSize/1500);
-        //EV << "[srcXR" << getIndex() << "] frame size = " << frameSize << ", num_pkts = "<< num_pkts << " and current time = " << simTime() << endl;
-
-        pkt_size = 64;
-        for(int i=1;i<num_pkts;i++){
-            pkt_size = 1542;
-            ethPacket *pkt = generateNewPacket();                       // generating the first packet at T = 0
-            send(pkt,"out");
-            //EV << "[srcXR] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
-        }
-        // sending the last packet
-        int pending = ceil(frameSize-(num_pkts-1)*1500);
-        pkt_size = min(1500,pending)+42;
-        ethPacket *pkt = generateNewPacket();                           // generating the first packet at T = 0
+        cPacket *pkt = generateNewPacket();                         // generating a new packet at current time
         send(pkt,"out");
-        //EV << "[srcXR" << getIndex() << "] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
 
-        double mean = 1.0/ArrivalRate;
-        double std = 2e-3;
-        pkt_interval = truncnormal(mean, std);                       // packet inter-arrival times are generated following truncnormal distribution
-
+        double mean = 1e-3*(1.0/ArrivalRate);                       // mean = 11 ms
+        double std = 1e-3;                                          // sd = 1 ms
+        pkt_interval = truncnormal(mean, std);                      // packet inter-arrival times are generated following gaussian distribution
         scheduleAt(simTime()+pkt_interval, generateEvent);          // scheduling the next packet generation
         //emit(arrivalSignal,pkt_interval);
-        //EV << "[srcXR" << getIndex() << "] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
+        //EV << "[srcCtr] pkt_interval = " << pkt_interval << " and current time = " << simTime() << endl;
     }
 }
 
 ethPacket *Control_Device::generateNewPacket()
 {
-    ethPacket *pkt = new ethPacket("xr_data");
-    pkt->setByteLength(pkt_size);                              // generating packets of same size
+    ethPacket *pkt = new ethPacket("control_data");
+    pkt->setByteLength(avgPacketSize);                              // generating packets of same size
     pkt->setGenerationTime(simTime());
-    //EV << "[srcXR" << getIndex() << "] New packet generated with size (bytes): " << pkt_size << endl;
+    //EV << "[srcCtr] New packet generated with size (bytes): " << avgPacketSize << endl;
     return pkt;
 }
 

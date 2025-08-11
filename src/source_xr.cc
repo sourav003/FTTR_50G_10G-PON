@@ -66,7 +66,7 @@ void XR_Device::initialize()
 
     // Initialize variables
     double mean = 1.0/ArrivalRate;
-    double std = 2e-3;                             // 10.5 % of mean
+    double std = 2e-3;                                          // std = 2 msec
     pkt_interval = truncnormal(mean, std);                       // packet inter-arrival times are generated following truncnormal distribution
     generateEvent = new cMessage("generateEvent");              // self-message is generated for next packet generation
     //emit(arrivalSignal,pkt_interval);

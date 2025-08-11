@@ -191,6 +191,8 @@ void gtc_header::copy(const gtc_header& other)
 {
     this->Downlink = other.Downlink;
     this->Uplink = other.Uplink;
+    this->Ext_pon = other.Ext_pon;
+    this->Int_pon = other.Int_pon;
     delete [] this->Olt_onu_rtt;
     this->Olt_onu_rtt = (other.Olt_onu_rtt_arraysize==0) ? nullptr : new double[other.Olt_onu_rtt_arraysize];
     Olt_onu_rtt_arraysize = other.Olt_onu_rtt_arraysize;
@@ -289,6 +291,8 @@ void gtc_header::parsimPack(omnetpp::cCommBuffer *b) const
     ::omnetpp::cPacket::parsimPack(b);
     doParsimPacking(b,this->Downlink);
     doParsimPacking(b,this->Uplink);
+    doParsimPacking(b,this->Ext_pon);
+    doParsimPacking(b,this->Int_pon);
     b->pack(Olt_onu_rtt_arraysize);
     doParsimArrayPacking(b,this->Olt_onu_rtt,Olt_onu_rtt_arraysize);
     b->pack(Onu_start_time_TC1_arraysize);
@@ -331,6 +335,8 @@ void gtc_header::parsimUnpack(omnetpp::cCommBuffer *b)
     ::omnetpp::cPacket::parsimUnpack(b);
     doParsimUnpacking(b,this->Downlink);
     doParsimUnpacking(b,this->Uplink);
+    doParsimUnpacking(b,this->Ext_pon);
+    doParsimUnpacking(b,this->Int_pon);
     delete [] this->Olt_onu_rtt;
     b->unpack(Olt_onu_rtt_arraysize);
     if (Olt_onu_rtt_arraysize == 0) {
@@ -470,6 +476,26 @@ bool gtc_header::getUplink() const
 void gtc_header::setUplink(bool Uplink)
 {
     this->Uplink = Uplink;
+}
+
+bool gtc_header::getExt_pon() const
+{
+    return this->Ext_pon;
+}
+
+void gtc_header::setExt_pon(bool Ext_pon)
+{
+    this->Ext_pon = Ext_pon;
+}
+
+bool gtc_header::getInt_pon() const
+{
+    return this->Int_pon;
+}
+
+void gtc_header::setInt_pon(bool Int_pon)
+{
+    this->Int_pon = Int_pon;
 }
 
 size_t gtc_header::getOlt_onu_rttArraySize() const
@@ -1473,6 +1499,8 @@ class gtc_headerDescriptor : public omnetpp::cClassDescriptor
     enum FieldConstants {
         FIELD_Downlink,
         FIELD_Uplink,
+        FIELD_Ext_pon,
+        FIELD_Int_pon,
         FIELD_Olt_onu_rtt,
         FIELD_Onu_start_time_TC1,
         FIELD_Onu_grant_TC1,
@@ -1560,7 +1588,7 @@ const char *gtc_headerDescriptor::getProperty(const char *propertyName) const
 int gtc_headerDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 23+base->getFieldCount() : 23;
+    return base ? 25+base->getFieldCount() : 25;
 }
 
 unsigned int gtc_headerDescriptor::getFieldTypeFlags(int field) const
@@ -1574,6 +1602,8 @@ unsigned int gtc_headerDescriptor::getFieldTypeFlags(int field) const
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,    // FIELD_Downlink
         FD_ISEDITABLE,    // FIELD_Uplink
+        FD_ISEDITABLE,    // FIELD_Ext_pon
+        FD_ISEDITABLE,    // FIELD_Int_pon
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Olt_onu_rtt
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Onu_start_time_TC1
         FD_ISARRAY | FD_ISEDITABLE | FD_ISRESIZABLE,    // FIELD_Onu_grant_TC1
@@ -1596,7 +1626,7 @@ unsigned int gtc_headerDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_BufferOccupancyTC3
         FD_ISEDITABLE,    // FIELD_SeqID
     };
-    return (field >= 0 && field < 23) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 25) ? fieldTypeFlags[field] : 0;
 }
 
 const char *gtc_headerDescriptor::getFieldName(int field) const
@@ -1610,6 +1640,8 @@ const char *gtc_headerDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "Downlink",
         "Uplink",
+        "Ext_pon",
+        "Int_pon",
         "Olt_onu_rtt",
         "Onu_start_time_TC1",
         "Onu_grant_TC1",
@@ -1632,7 +1664,7 @@ const char *gtc_headerDescriptor::getFieldName(int field) const
         "BufferOccupancyTC3",
         "SeqID",
     };
-    return (field >= 0 && field < 23) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 25) ? fieldNames[field] : nullptr;
 }
 
 int gtc_headerDescriptor::findField(const char *fieldName) const
@@ -1641,27 +1673,29 @@ int gtc_headerDescriptor::findField(const char *fieldName) const
     int baseIndex = base ? base->getFieldCount() : 0;
     if (strcmp(fieldName, "Downlink") == 0) return baseIndex + 0;
     if (strcmp(fieldName, "Uplink") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "Olt_onu_rtt") == 0) return baseIndex + 2;
-    if (strcmp(fieldName, "Onu_start_time_TC1") == 0) return baseIndex + 3;
-    if (strcmp(fieldName, "Onu_grant_TC1") == 0) return baseIndex + 4;
-    if (strcmp(fieldName, "Onu_start_time_TC2") == 0) return baseIndex + 5;
-    if (strcmp(fieldName, "Onu_grant_TC2") == 0) return baseIndex + 6;
-    if (strcmp(fieldName, "Onu_start_time_TC3") == 0) return baseIndex + 7;
-    if (strcmp(fieldName, "Onu_grant_TC3") == 0) return baseIndex + 8;
-    if (strcmp(fieldName, "Mfu_sfu_rtt") == 0) return baseIndex + 9;
-    if (strcmp(fieldName, "Sfu_start_time_TC1") == 0) return baseIndex + 10;
-    if (strcmp(fieldName, "Sfu_grant_TC1") == 0) return baseIndex + 11;
-    if (strcmp(fieldName, "Sfu_start_time_TC2") == 0) return baseIndex + 12;
-    if (strcmp(fieldName, "Sfu_grant_TC2") == 0) return baseIndex + 13;
-    if (strcmp(fieldName, "Sfu_start_time_TC3") == 0) return baseIndex + 14;
-    if (strcmp(fieldName, "Sfu_grant_TC3") == 0) return baseIndex + 15;
-    if (strcmp(fieldName, "OnuID") == 0) return baseIndex + 16;
-    if (strcmp(fieldName, "SfuID") == 0) return baseIndex + 17;
-    if (strcmp(fieldName, "MfuID") == 0) return baseIndex + 18;
-    if (strcmp(fieldName, "BufferOccupancyTC1") == 0) return baseIndex + 19;
-    if (strcmp(fieldName, "BufferOccupancyTC2") == 0) return baseIndex + 20;
-    if (strcmp(fieldName, "BufferOccupancyTC3") == 0) return baseIndex + 21;
-    if (strcmp(fieldName, "SeqID") == 0) return baseIndex + 22;
+    if (strcmp(fieldName, "Ext_pon") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "Int_pon") == 0) return baseIndex + 3;
+    if (strcmp(fieldName, "Olt_onu_rtt") == 0) return baseIndex + 4;
+    if (strcmp(fieldName, "Onu_start_time_TC1") == 0) return baseIndex + 5;
+    if (strcmp(fieldName, "Onu_grant_TC1") == 0) return baseIndex + 6;
+    if (strcmp(fieldName, "Onu_start_time_TC2") == 0) return baseIndex + 7;
+    if (strcmp(fieldName, "Onu_grant_TC2") == 0) return baseIndex + 8;
+    if (strcmp(fieldName, "Onu_start_time_TC3") == 0) return baseIndex + 9;
+    if (strcmp(fieldName, "Onu_grant_TC3") == 0) return baseIndex + 10;
+    if (strcmp(fieldName, "Mfu_sfu_rtt") == 0) return baseIndex + 11;
+    if (strcmp(fieldName, "Sfu_start_time_TC1") == 0) return baseIndex + 12;
+    if (strcmp(fieldName, "Sfu_grant_TC1") == 0) return baseIndex + 13;
+    if (strcmp(fieldName, "Sfu_start_time_TC2") == 0) return baseIndex + 14;
+    if (strcmp(fieldName, "Sfu_grant_TC2") == 0) return baseIndex + 15;
+    if (strcmp(fieldName, "Sfu_start_time_TC3") == 0) return baseIndex + 16;
+    if (strcmp(fieldName, "Sfu_grant_TC3") == 0) return baseIndex + 17;
+    if (strcmp(fieldName, "OnuID") == 0) return baseIndex + 18;
+    if (strcmp(fieldName, "SfuID") == 0) return baseIndex + 19;
+    if (strcmp(fieldName, "MfuID") == 0) return baseIndex + 20;
+    if (strcmp(fieldName, "BufferOccupancyTC1") == 0) return baseIndex + 21;
+    if (strcmp(fieldName, "BufferOccupancyTC2") == 0) return baseIndex + 22;
+    if (strcmp(fieldName, "BufferOccupancyTC3") == 0) return baseIndex + 23;
+    if (strcmp(fieldName, "SeqID") == 0) return baseIndex + 24;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -1676,6 +1710,8 @@ const char *gtc_headerDescriptor::getFieldTypeString(int field) const
     static const char *fieldTypeStrings[] = {
         "bool",    // FIELD_Downlink
         "bool",    // FIELD_Uplink
+        "bool",    // FIELD_Ext_pon
+        "bool",    // FIELD_Int_pon
         "double",    // FIELD_Olt_onu_rtt
         "double",    // FIELD_Onu_start_time_TC1
         "double",    // FIELD_Onu_grant_TC1
@@ -1698,7 +1734,7 @@ const char *gtc_headerDescriptor::getFieldTypeString(int field) const
         "double",    // FIELD_BufferOccupancyTC3
         "long",    // FIELD_SeqID
     };
-    return (field >= 0 && field < 23) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 25) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **gtc_headerDescriptor::getFieldPropertyNames(int field) const
@@ -1811,6 +1847,8 @@ std::string gtc_headerDescriptor::getFieldValueAsString(omnetpp::any_ptr object,
     switch (field) {
         case FIELD_Downlink: return bool2string(pp->getDownlink());
         case FIELD_Uplink: return bool2string(pp->getUplink());
+        case FIELD_Ext_pon: return bool2string(pp->getExt_pon());
+        case FIELD_Int_pon: return bool2string(pp->getInt_pon());
         case FIELD_Olt_onu_rtt: return double2string(pp->getOlt_onu_rtt(i));
         case FIELD_Onu_start_time_TC1: return double2string(pp->getOnu_start_time_TC1(i));
         case FIELD_Onu_grant_TC1: return double2string(pp->getOnu_grant_TC1(i));
@@ -1850,6 +1888,8 @@ void gtc_headerDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fi
     switch (field) {
         case FIELD_Downlink: pp->setDownlink(string2bool(value)); break;
         case FIELD_Uplink: pp->setUplink(string2bool(value)); break;
+        case FIELD_Ext_pon: pp->setExt_pon(string2bool(value)); break;
+        case FIELD_Int_pon: pp->setInt_pon(string2bool(value)); break;
         case FIELD_Olt_onu_rtt: pp->setOlt_onu_rtt(i,string2double(value)); break;
         case FIELD_Onu_start_time_TC1: pp->setOnu_start_time_TC1(i,string2double(value)); break;
         case FIELD_Onu_grant_TC1: pp->setOnu_grant_TC1(i,string2double(value)); break;
@@ -1887,6 +1927,8 @@ omnetpp::cValue gtc_headerDescriptor::getFieldValue(omnetpp::any_ptr object, int
     switch (field) {
         case FIELD_Downlink: return pp->getDownlink();
         case FIELD_Uplink: return pp->getUplink();
+        case FIELD_Ext_pon: return pp->getExt_pon();
+        case FIELD_Int_pon: return pp->getInt_pon();
         case FIELD_Olt_onu_rtt: return pp->getOlt_onu_rtt(i);
         case FIELD_Onu_start_time_TC1: return pp->getOnu_start_time_TC1(i);
         case FIELD_Onu_grant_TC1: return pp->getOnu_grant_TC1(i);
@@ -1926,6 +1968,8 @@ void gtc_headerDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int
     switch (field) {
         case FIELD_Downlink: pp->setDownlink(value.boolValue()); break;
         case FIELD_Uplink: pp->setUplink(value.boolValue()); break;
+        case FIELD_Ext_pon: pp->setExt_pon(value.boolValue()); break;
+        case FIELD_Int_pon: pp->setInt_pon(value.boolValue()); break;
         case FIELD_Olt_onu_rtt: pp->setOlt_onu_rtt(i,value.doubleValue()); break;
         case FIELD_Onu_start_time_TC1: pp->setOnu_start_time_TC1(i,value.doubleValue()); break;
         case FIELD_Onu_grant_TC1: pp->setOnu_grant_TC1(i,value.doubleValue()); break;

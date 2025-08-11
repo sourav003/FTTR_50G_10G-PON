@@ -22,7 +22,7 @@ packet ethPacket extends cPacket
     simtime_t SfuDepartureTime;    
     simtime_t OnuArrivalTime;
     simtime_t OnuDepartureTime;
-    simtime_t OltArrivalTime;
+    //simtime_t OltArrivalTime;
     
     int OnuId;							// intended receipient ONU
     int SfuId;

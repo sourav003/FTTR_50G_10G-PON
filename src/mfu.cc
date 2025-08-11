@@ -132,6 +132,39 @@ void MFU::handleMessage(cMessage *msg)
 
             //delete pkt;
         }
+        else if(strcmp(msg->getName(),"hmd_data") == 0) {        // updating buffer size after receiving requests from SFUs
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            int sfuId = pkt->getSfuId();
+            int tcId = pkt->getTContId();
+            pkt->setMfuId(getIndex());
+            pkt->setSfuId(sfuId);
+            send(pkt,"OnuGate_out");                     // just forward to ONU
+
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"control_data") == 0) {        // updating buffer size after receiving requests from SFUs
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            int sfuId = pkt->getSfuId();
+            int tcId = pkt->getTContId();
+            pkt->setMfuId(getIndex());
+            pkt->setSfuId(sfuId);
+            send(pkt,"OnuGate_out");                     // just forward to ONU
+
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"haptic_data") == 0) {        // updating buffer size after receiving requests from SFUs
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            int sfuId = pkt->getSfuId();
+            int tcId = pkt->getTContId();
+            pkt->setMfuId(getIndex());
+            pkt->setSfuId(sfuId);
+            send(pkt,"OnuGate_out");                     // just forward to ONU
+
+            //delete pkt;
+        }
     }
     else {
         if(strcmp(msg->getName(),"ping") == 0) {
@@ -170,6 +203,7 @@ void MFU::handleMessage(cMessage *msg)
             //EV << "[mfu" << getIndex() << "] total GTC DL Header size = " << gtc_hdr_sz << endl;
             gtc_hdr_dl->setByteLength(gtc_hdr_sz);
             gtc_hdr_dl->setDownlink(true);
+            gtc_hdr_dl->setInt_pon(true);
             gtc_hdr_dl->setSeqID(++seqID);
             gtc_hdr_dl->setMfu_sfu_rttArraySize(sfus);
             for (int i = 0; i < sfus; ++i) {

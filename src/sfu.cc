@@ -42,7 +42,7 @@ class SFU : public cSimpleModule
         long seqID;
 
         //simsignal_t latencySignalXr;
-        simsignal_t latencySignalBkg;
+        //simsignal_t latencySignalBkg;
 
     public:
         virtual ~SFU();
@@ -58,7 +58,7 @@ Define_Module(SFU);
 void SFU::initialize()
 {
     //latencySignalXr = registerSignal("xr_latency");                     // registering the signal
-    latencySignalBkg = registerSignal("bkg_latency");
+    //latencySignalBkg = registerSignal("bkg_latency");
 
     queue_TC1.setName("queue_TC1");
     queue_TC2.setName("queue_TC2");
@@ -107,6 +107,63 @@ void SFU::handleMessage(cMessage *msg)
             //delete pkt;
         }
         else if(strcmp(msg->getName(),"xr_data") == 0) {                    // background traffic is considered for T-CONT 3
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+            double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
+            if(buffer <= sfu_buffer_capacity) {                             // queue the current packet if there is buffer capacity
+                pkt->setSfuArrivalTime(pkt->getArrivalTime());
+                pkt->setSfuId(getIndex());
+                pkt->setTContId(2);                 // for TC-2
+                //pkt->setTContId(3);               // for TC-3
+                //EV << "[sfu" << getIndex() << "] Packet arrived from source and being queued at SFU" << endl;
+                queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
+                pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
+                //EV << "[sfu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at SFU = " << getIndex() <<endl;
+                //EV << "[sfu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at SFU = " << getIndex() <<endl;
+            }
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"hmd_data") == 0) {                    // background traffic is considered for T-CONT 3
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+            double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
+            if(buffer <= sfu_buffer_capacity) {                             // queue the current packet if there is buffer capacity
+                pkt->setSfuArrivalTime(pkt->getArrivalTime());
+                pkt->setSfuId(getIndex());
+                pkt->setTContId(2);                 // for TC-2
+                //pkt->setTContId(3);               // for TC-3
+                //EV << "[sfu" << getIndex() << "] Packet arrived from source and being queued at SFU" << endl;
+                queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
+                pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
+                //EV << "[sfu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at SFU = " << getIndex() <<endl;
+                //EV << "[sfu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at SFU = " << getIndex() <<endl;
+            }
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"control_data") == 0) {                    // background traffic is considered for T-CONT 3
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+            double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
+            if(buffer <= sfu_buffer_capacity) {                             // queue the current packet if there is buffer capacity
+                pkt->setSfuArrivalTime(pkt->getArrivalTime());
+                pkt->setSfuId(getIndex());
+                pkt->setTContId(2);                 // for TC-2
+                //pkt->setTContId(3);               // for TC-3
+                //EV << "[sfu" << getIndex() << "] Packet arrived from source and being queued at SFU" << endl;
+                queue_TC2.insert(pkt);
+                //queue_TC3.insert(pkt);
+                pending_buffer_TC2 += pkt->getByteLength();
+                //pending_buffer_TC3 += pkt->getByteLength();
+
+                //EV << "[sfu" << getIndex() << "] Current TC2 queue length = " << queue_TC2.getLength() << " at SFU = " << getIndex() <<endl;
+                //EV << "[sfu" << getIndex() << "] Current buffer length = " << pending_buffer_TC2 << " at SFU = " << getIndex() <<endl;
+            }
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"haptic_data") == 0) {                    // background traffic is considered for T-CONT 3
             ethPacket *pkt = check_and_cast<ethPacket *>(msg);
             double buffer = pending_buffer_TC1 + pending_buffer_TC2 + pending_buffer_TC3 + pkt->getByteLength();      // future buffer size if current packet is queued
             if(buffer <= sfu_buffer_capacity) {                             // queue the current packet if there is buffer capacity
@@ -282,9 +339,9 @@ void SFU::handleMessage(cMessage *msg)
                         data->setSfuDepartureTime(data->getSendingTime());
 
                         if(strcmp(data->getName(),"bkg_data") == 0) {
-                            double bkg_packet_latency = data->getSfuDepartureTime().dbl() - data->getSfuArrivalTime().dbl();
+                            //double bkg_packet_latency = data->getSfuDepartureTime().dbl() - data->getSfuArrivalTime().dbl();
                             //EV << "[sfu" << getIndex() << "] packet_latency: " << packet_latency << endl;
-                            emit(latencySignalBkg, bkg_packet_latency);
+                            //emit(latencySignalBkg, bkg_packet_latency);
                         }
                         /*if(strcmp(data->getName(),"xr_data") == 0) {
                             double xr_packet_latency = data->getSfuDepartureTime().dbl() - data->getSfuArrivalTime().dbl();

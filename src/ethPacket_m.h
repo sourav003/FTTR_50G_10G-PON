@@ -29,7 +29,7 @@ class ethPacket;
  *     simtime_t SfuDepartureTime;
  *     simtime_t OnuArrivalTime;
  *     simtime_t OnuDepartureTime;
- *     simtime_t OltArrivalTime;
+ *     //simtime_t OltArrivalTime;
  * 
  *     int OnuId;							// intended receipient ONU
  *     int SfuId;
@@ -49,7 +49,6 @@ class ethPacket : public ::omnetpp::cPacket
     omnetpp::simtime_t SfuDepartureTime = SIMTIME_ZERO;
     omnetpp::simtime_t OnuArrivalTime = SIMTIME_ZERO;
     omnetpp::simtime_t OnuDepartureTime = SIMTIME_ZERO;
-    omnetpp::simtime_t OltArrivalTime = SIMTIME_ZERO;
     int OnuId = 0;
     int SfuId = 0;
     int MfuId = 0;
@@ -91,9 +90,6 @@ class ethPacket : public ::omnetpp::cPacket
 
     virtual omnetpp::simtime_t getOnuDepartureTime() const;
     virtual void setOnuDepartureTime(omnetpp::simtime_t OnuDepartureTime);
-
-    virtual omnetpp::simtime_t getOltArrivalTime() const;
-    virtual void setOltArrivalTime(omnetpp::simtime_t OltArrivalTime);
 
     virtual int getOnuId() const;
     virtual void setOnuId(int OnuId);

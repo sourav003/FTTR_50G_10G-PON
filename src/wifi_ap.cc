@@ -50,7 +50,9 @@ void WiFi_AP::initialize()
     gate("SrcHmd_in")->setDeliverImmediately(true);
     gate("SrcHpt_in")->setDeliverImmediately(true);
     gate("SrcCtr_in")->setDeliverImmediately(true);
-    gate("SrcBkg_in")->setDeliverImmediately(true);
+    gate("SrcBkg1_in")->setDeliverImmediately(true);
+    gate("SrcBkg2_in")->setDeliverImmediately(true);
+    gate("SrcBkg3_in")->setDeliverImmediately(true);
 }
 
 void WiFi_AP::handleMessage(cMessage *msg)
@@ -59,13 +61,46 @@ void WiFi_AP::handleMessage(cMessage *msg)
         if(strcmp(msg->getName(),"bkg_data") == 0) {        // updating buffer size after receiving requests from ONUs
             ethPacket *pkt = check_and_cast<ethPacket *>(msg);
 
+            pkt->setWapArrivalTime(pkt->getArrivalTime());
             send(pkt,"Sfu_out");                            // just forward to SFU
+            pkt->setWapDepartureTime(pkt->getSendingTime());
+
             //delete pkt;
         }
         else if(strcmp(msg->getName(),"xr_data") == 0) {        // updating buffer size after receiving requests from ONUs
             ethPacket *pkt = check_and_cast<ethPacket *>(msg);
 
+            pkt->setWapArrivalTime(pkt->getArrivalTime());
             send(pkt,"Sfu_out");                            // just forward to SFU
+            pkt->setWapDepartureTime(pkt->getSendingTime());
+
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"hmd_data") == 0) {        // updating buffer size after receiving requests from ONUs
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            pkt->setWapArrivalTime(pkt->getArrivalTime());
+            send(pkt,"Sfu_out");                            // just forward to SFU
+            pkt->setWapDepartureTime(pkt->getSendingTime());
+
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"control_data") == 0) {        // updating buffer size after receiving requests from ONUs
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            pkt->setWapArrivalTime(pkt->getArrivalTime());
+            send(pkt,"Sfu_out");                            // just forward to SFU
+            pkt->setWapDepartureTime(pkt->getSendingTime());
+
+            //delete pkt;
+        }
+        else if(strcmp(msg->getName(),"haptic_data") == 0) {        // updating buffer size after receiving requests from ONUs
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            pkt->setWapArrivalTime(pkt->getArrivalTime());
+            send(pkt,"Sfu_out");                            // just forward to SFU
+            pkt->setWapDepartureTime(pkt->getSendingTime());
+
             //delete pkt;
         }
     }

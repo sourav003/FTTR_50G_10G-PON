@@ -24,6 +24,8 @@ class gtc_header;
  * {
  *     bool Downlink = false;
  *     bool Uplink = false;
+ *     bool Ext_pon = false;
+ *     bool Int_pon = false;
  * 
  *     //uint32_t PSync;					// 4 Bytes
  *     //uint32_t Ident;					// 4 Bytes
@@ -76,6 +78,8 @@ class gtc_header : public ::omnetpp::cPacket
   protected:
     bool Downlink = false;
     bool Uplink = false;
+    bool Ext_pon = false;
+    bool Int_pon = false;
     double *Olt_onu_rtt = nullptr;
     size_t Olt_onu_rtt_arraysize = 0;
     double *Onu_start_time_TC1 = nullptr;
@@ -132,6 +136,12 @@ class gtc_header : public ::omnetpp::cPacket
 
     virtual bool getUplink() const;
     virtual void setUplink(bool Uplink);
+
+    virtual bool getExt_pon() const;
+    virtual void setExt_pon(bool Ext_pon);
+
+    virtual bool getInt_pon() const;
+    virtual void setInt_pon(bool Int_pon);
 
     virtual void setOlt_onu_rttArraySize(size_t size);
     virtual size_t getOlt_onu_rttArraySize() const;

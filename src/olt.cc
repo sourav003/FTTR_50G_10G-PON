@@ -44,6 +44,12 @@ class OLT : public cSimpleModule
         double onu_max_grant;
 
         //simsignal_t errorSignal;
+        simsignal_t latencySignalXr;
+        simsignal_t latencySignalHmd;
+        simsignal_t latencySignalCtr;
+        simsignal_t latencySignalHpt;
+        simsignal_t latencySignalBkg;
+
 
     public:
         //virtual ~OLT();
@@ -65,6 +71,12 @@ Define_Module(OLT);
 void OLT::initialize()
 {
     //errorSignal = registerSignal("pkt_error");  // registering the signal
+    latencySignalXr = registerSignal("xr_latency");
+    latencySignalHmd = registerSignal("hmd_latency");
+    latencySignalCtr = registerSignal("ctrl_latency");
+    latencySignalHpt = registerSignal("hptc_latency");
+    latencySignalBkg = registerSignal("bkg_latency");
+
     //olt_queue.setName("olt_queue");
 
     gate("SpltGate_i")->setDeliverImmediately(true);
@@ -98,7 +110,7 @@ void OLT::initialize()
 void OLT::handleMessage(cMessage *msg)
 {
     if(msg->isPacket() == true) {
-        if(strcmp(msg->getName(),"gtc_hdr_ul") == 0) {        // updating buffer size after receiving requests from ONUs
+        if(strcmp(msg->getName(),"gtc_hdr_ul") == 0) {                  // updating buffer size after receiving requests from ONUs
             gtc_header *pkt = check_and_cast<gtc_header *>(msg);
 
             int onuId = pkt->getOnuID();
@@ -111,20 +123,79 @@ void OLT::handleMessage(cMessage *msg)
 
             delete pkt;         // nothing more to do with the header
         }
-        else if(strcmp(msg->getName(),"bkg_data") == 0) {        // updating buffer size after receiving requests from ONUs
+        else if(strcmp(msg->getName(),"bkg_data") == 0) {
             ethPacket *pkt = check_and_cast<ethPacket *>(msg);
 
             int onuId = pkt->getOnuId();
+            int sfuId = pkt->getSfuId();
+            int mfuId = pkt->getMfuId();
             int tcId = pkt->getTContId();
 
+            if((onuId==0) && (mfuId==0)) {                          // Background from random devices at all SFUs
+                double bkg_packet_latency = pkt->getArrivalTime().dbl() - pkt->getGenerationTime().dbl();
+                EV << "[olt] background packet_latency: " << bkg_packet_latency << endl;
+                emit(latencySignalBkg, bkg_packet_latency);
+            }
             delete pkt;
         }
-        else if(strcmp(msg->getName(),"xr_data") == 0) {        // updating buffer size after receiving requests from ONUs
+        else if(strcmp(msg->getName(),"xr_data") == 0) {
             ethPacket *pkt = check_and_cast<ethPacket *>(msg);
 
             int onuId = pkt->getOnuId();
+            int sfuId = pkt->getSfuId();
+            int mfuId = pkt->getMfuId();
             int tcId = pkt->getTContId();
 
+            if((onuId==0) && (mfuId==0) && ((sfuId%2)==0)) {            // XR from robots at odd SFUs
+                double xr_packet_latency = pkt->getArrivalTime().dbl() - pkt->getGenerationTime().dbl();
+                EV << "[olt] XR packet_latency: " << xr_packet_latency << endl;
+                emit(latencySignalXr, xr_packet_latency);
+            }
+            delete pkt;
+        }
+        else if(strcmp(msg->getName(),"haptic_data") == 0) {
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            int onuId = pkt->getOnuId();
+            int sfuId = pkt->getSfuId();
+            int mfuId = pkt->getMfuId();
+            int tcId = pkt->getTContId();
+
+            if((onuId==0) && (mfuId==0) && ((sfuId%2)==0)) {            // Haptics from robots at odd SFUs
+                double hptc_packet_latency = pkt->getArrivalTime().dbl() - pkt->getGenerationTime().dbl();
+                EV << "[olt] Haptic packet_latency: " << hptc_packet_latency << endl;
+                emit(latencySignalHpt, hptc_packet_latency);
+            }
+            delete pkt;
+        }
+        else if(strcmp(msg->getName(),"hmd_data") == 0) {
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            int onuId = pkt->getOnuId();
+            int sfuId = pkt->getSfuId();
+            int mfuId = pkt->getMfuId();
+            int tcId = pkt->getTContId();
+
+            if((onuId==0) && (mfuId==0) && ((sfuId%2)!=0)) {            // HMD from humans at odd SFUs
+                double hmd_packet_latency = pkt->getArrivalTime().dbl() - pkt->getGenerationTime().dbl();
+                EV << "[olt] HMD packet_latency: " << hmd_packet_latency << endl;
+                emit(latencySignalHmd, hmd_packet_latency);
+            }
+            delete pkt;
+        }
+        else if(strcmp(msg->getName(),"control_data") == 0) {
+            ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+
+            int onuId = pkt->getOnuId();
+            int sfuId = pkt->getSfuId();
+            int mfuId = pkt->getMfuId();
+            int tcId = pkt->getTContId();
+
+            if((onuId==0) && (mfuId==0) && ((sfuId%2)!=0)) {            // Control from humans at odd SFUs
+                double ctrl_packet_latency = pkt->getArrivalTime().dbl() - pkt->getGenerationTime().dbl();
+                EV << "[olt] Control packet_latency: " << ctrl_packet_latency << endl;
+                emit(latencySignalCtr, ctrl_packet_latency);
+            }
             delete pkt;
         }
     }
@@ -162,6 +233,7 @@ void OLT::handleMessage(cMessage *msg)
             //EV << "[olt] total GTC DL Header size = " << gtc_hdr_sz << endl;
             gtc_hdr_dl->setByteLength(gtc_hdr_sz);
             gtc_hdr_dl->setDownlink(true);
+            gtc_hdr_dl->setExt_pon(true);
             gtc_hdr_dl->setSeqID(++seqID);
             gtc_hdr_dl->setOlt_onu_rttArraySize(onus);
             for (int i = 0; i < onus; ++i) {

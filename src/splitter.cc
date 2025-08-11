@@ -76,7 +76,10 @@ void Splitter::handleMessage(cMessage *msg)
                     }
                     else {
                         gtc_header *copy = pkt->dup();
-                        copy->setOnuID(k);                  // set the OnuID with the current value k
+                        if(pkt->getExt_pon())
+                            copy->setOnuID(k);                  // set the OnuID with the current value k
+                        else if(pkt->getInt_pon())
+                            copy->setSfuID(k);
                         onu_queue.insert(copy);
 
                         cMessage *onu_tx = new cMessage("ONU_Tx_Delay");
@@ -106,14 +109,50 @@ void Splitter::handleMessage(cMessage *msg)
                     EV << "[splt] gtc_hdr_ul queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
                 }
 
-                if ((strcmp(msg->getName(), "bkg_data") == 0)||(strcmp(msg->getName(), "xr_data") == 0)) {
+                if (strcmp(msg->getName(), "bkg_data") == 0) {
                     ethPacket *pkt = check_and_cast<ethPacket *>(msg);
                     olt_queue.insert(pkt);
 
                     cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
                     scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
                     olt_queue_size += pkt->getByteLength();
-                    EV << "[splt] bkg_data queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
+                    EV << "[splt] bkg data packet queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
+                }
+                else if (strcmp(msg->getName(), "xr_data") == 0) {
+                    ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+                    olt_queue.insert(pkt);
+
+                    cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
+                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
+                    olt_queue_size += pkt->getByteLength();
+                    EV << "[splt] bkg data packet queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
+                }
+                else if (strcmp(msg->getName(), "hmd_data") == 0) {
+                    ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+                    olt_queue.insert(pkt);
+
+                    cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
+                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
+                    olt_queue_size += pkt->getByteLength();
+                    EV << "[splt] bkg data packet queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
+                }
+                else if (strcmp(msg->getName(), "control_data") == 0) {
+                    ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+                    olt_queue.insert(pkt);
+
+                    cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
+                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
+                    olt_queue_size += pkt->getByteLength();
+                    EV << "[splt] bkg data packet queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
+                }
+                else if (strcmp(msg->getName(), "haptic_data") == 0) {
+                    ethPacket *pkt = check_and_cast<ethPacket *>(msg);
+                    olt_queue.insert(pkt);
+
+                    cMessage *olt_tx = new cMessage("OLT_Tx_Delay");
+                    scheduleAt(olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate),olt_tx);
+                    olt_queue_size += pkt->getByteLength();
+                    EV << "[splt] bkg data packet queued; OLT_Tx_Delay at: " << olt_ch->getTransmissionFinishTime()+(simtime_t)(olt_queue_size*8/pon_datarate) << ", Queue size = " << olt_queue_size << endl;
                 }
             }
         }
@@ -143,6 +182,27 @@ void Splitter::handleMessage(cMessage *msg)
                     ethPacket *pkt = (ethPacket *)olt_queue.pop();
                     send(pkt,"OltGate_o");
                     EV << "[splt] Sent delayed xr_data at: " << simTime() << endl;
+                    olt_queue_size -= pkt->getByteLength();
+                }
+                if(strcmp(olt_queue.front()->getName(),"hmd_data") == 0) {
+                    EV << "[splt] sending hmd_data packet to OLT at "<< simTime() << endl;
+                    ethPacket *pkt = (ethPacket *)olt_queue.pop();
+                    send(pkt,"OltGate_o");
+                    EV << "[splt] Sent delayed hmd_data at: " << simTime() << endl;
+                    olt_queue_size -= pkt->getByteLength();
+                }
+                if(strcmp(olt_queue.front()->getName(),"control_data") == 0) {
+                    EV << "[splt] sending control_data packet to OLT at "<< simTime() << endl;
+                    ethPacket *pkt = (ethPacket *)olt_queue.pop();
+                    send(pkt,"OltGate_o");
+                    EV << "[splt] Sent delayed control_data at: " << simTime() << endl;
+                    olt_queue_size -= pkt->getByteLength();
+                }
+                if(strcmp(olt_queue.front()->getName(),"haptic_data") == 0) {
+                    EV << "[splt] sending haptic_data packet to OLT at "<< simTime() << endl;
+                    ethPacket *pkt = (ethPacket *)olt_queue.pop();
+                    send(pkt,"OltGate_o");
+                    EV << "[splt] Sent delayed haptic_data at: " << simTime() << endl;
                     olt_queue_size -= pkt->getByteLength();
                 }
             }
