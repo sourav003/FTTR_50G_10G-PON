@@ -46,7 +46,7 @@ void Splitter::initialize()
     cGate *g = gate("OltGate_o");                   // get the gate
     cChannel *ch = g->getChannel();                 // get the channel object
     if (ch != nullptr) {
-        double pon_datarate = ch->par("datarate").doubleValue();  // in bits per second
+        pon_datarate = ch->par("datarate").doubleValue();  // in bits per second
     }
 
     // Make sure incoming message is delivered immediately
